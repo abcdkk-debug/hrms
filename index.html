@@ -6,8 +6,9 @@
 <title>HRMS 人力資源管理系統</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--blue:#2563eb;--blue2:#1e40af;--teal:#0ea5a4;--bg:#f1f5f9;--card:#fff;--text:#0f172a;--muted:#64748b;--line:#e2e8f0;--green:#16a34a;--amber:#d97706;--red:#dc2626;--radius:14px}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang HK","Microsoft JhengHei",sans-serif;background:var(--bg);color:var(--text)}
+:root{--blue:#2563eb;--blue2:#1e40af;--teal:#0ea5a4;--bg:#f1f5f9;--card:#fff;--text:#0f172a;--muted:#64748b;--line:#e2e8f0;--green:#16a34a;--amber:#d97706;--red:#dc2626;--radius:14px;--hover:#f8fafc;--input:#fff;--track:#e2e8f0}
+html[data-theme="dark"]{--bg:#0b1220;--card:#16213a;--text:#e2e8f0;--muted:#94a3b8;--line:#263453;--hover:#1b2a4a;--input:#0f1a30;--track:#263453}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang HK","Microsoft JhengHei",sans-serif;background:var(--bg);color:var(--text);transition:background .2s,color .2s}
 a{color:var(--blue);text-decoration:none}
 .layout{display:flex;min-height:100vh}
 .sidebar{width:232px;background:#0f2447;color:#dbeafe;display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;z-index:20}
@@ -15,20 +16,25 @@ a{color:var(--blue);text-decoration:none}
 .logo h1{font-size:20px;color:#fff;letter-spacing:.5px}
 .logo p{font-size:12px;opacity:.75;margin-top:4px;line-height:1.5}
 .nav{padding:12px 10px;display:flex;flex-direction:column;gap:4px}
-.nav button{background:none;border:0;color:#dbeafe;text-align:left;padding:11px 12px;border-radius:10px;font-size:15px;cursor:pointer;display:flex;gap:10px;align-items:center}
+.nav button{background:none;border:0;color:#dbeafe;text-align:left;padding:11px 12px;border-radius:10px;font-size:15px;cursor:pointer;display:flex;gap:10px;align-items:center;font-family:inherit}
 .nav button:hover{background:rgba(255,255,255,.08)}
 .nav button.active{background:var(--blue);color:#fff}
-.sidefoot{margin-top:auto;padding:14px 18px;font-size:12px;opacity:.7;line-height:1.6;border-top:1px solid rgba(255,255,255,.12)}
+.sidefoot{margin-top:auto;padding:14px 18px;font-size:12px;opacity:.85;line-height:1.7;border-top:1px solid rgba(255,255,255,.12)}
+.uibtns{display:flex;gap:8px;margin-bottom:10px}
+.uibtns button{flex:1;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:7px 4px;font-size:13px;cursor:pointer;font-family:inherit}
+.uibtns button:hover{background:rgba(255,255,255,.2)}
 .main{flex:1;margin-left:232px;padding:22px 26px 40px;min-width:0}
 .topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
 .topbar h2{font-size:24px}
 .topbar .sub{color:var(--muted);font-size:13px;margin-top:3px}
-.btn{background:var(--blue);color:#fff;border:0;padding:9px 16px;border-radius:9px;font-size:14px;cursor:pointer}
+.btn{background:var(--blue);color:#fff;border:0;padding:9px 16px;border-radius:9px;font-size:14px;cursor:pointer;font-family:inherit}
 .btn:hover{background:var(--blue2)}
-.btn.ghost{background:#fff;color:var(--text);border:1px solid var(--line)}
+.btn.ghost{background:var(--card);color:var(--text);border:1px solid var(--line)}
 .btn.small{padding:6px 11px;font-size:13px}
-.btn.danger{background:#fff;color:var(--red);border:1px solid #fecaca}
+.btn.danger{background:var(--card);color:var(--red);border:1px solid #fecaca}
+html[data-theme="dark"] .btn.danger{border-color:#7f1d1d}
 .btn.green{background:var(--green)} .btn.amber{background:var(--amber)}
+.btn:disabled{cursor:not-allowed}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:18px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
 .card .k{font-size:13px;color:var(--muted)} .card .v{font-size:30px;font-weight:700;margin:6px 0 2px} .card .d{font-size:12px;color:var(--muted)}
@@ -39,116 +45,127 @@ a{color:var(--blue);text-decoration:none}
 table{width:100%;border-collapse:collapse;font-size:14px}
 th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
 th{color:var(--muted);font-size:12px;letter-spacing:.4px}
-tr:hover td{background:#f8fafc}
+tr:hover td{background:var(--hover)}
 .badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600}
 .b-green{background:#dcfce7;color:#166534}.b-amber{background:#fef3c7;color:#92400e}.b-red{background:#fee2e2;color:#991b1b}.b-blue{background:#dbeafe;color:#1e40af}.b-gray{background:#e2e8f0;color:#475569}
+html[data-theme="dark"] .b-green{background:#14532d;color:#bbf7d0}html[data-theme="dark"] .b-amber{background:#78350f;color:#fde68a}html[data-theme="dark"] .b-red{background:#7f1d1d;color:#fecaca}html[data-theme="dark"] .b-blue{background:#1e3a8a;color:#bfdbfe}html[data-theme="dark"] .b-gray{background:#334155;color:#cbd5e1}
 .avatar{width:36px;height:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex:none}
 .person{display:flex;gap:10px;align-items:center}
 .person small{display:block;color:var(--muted);font-size:12px}
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
-.toolbar input,.toolbar select,.field input,.field select,.field textarea{padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:14px;background:#fff;font-family:inherit}
+.toolbar input,.toolbar select,.field input,.field select,.field textarea{padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:14px;background:var(--input);color:var(--text);font-family:inherit}
 .toolbar input{flex:1;min-width:180px}
 .page{display:none}.page.active{display:block}
 .bar-row{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:13px}
-.bar-row .name{width:110px;flex:none}.bar-track{flex:1;background:#e2e8f0;border-radius:99px;height:12px;overflow:hidden}
+.bar-row .name{width:110px;flex:none}.bar-track{flex:1;background:var(--track);border-radius:99px;height:12px;overflow:hidden}
 .bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--teal));border-radius:99px}
 .bar-row .num{width:52px;text-align:right;color:var(--muted)}
 .modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:flex-start;justify-content:center;padding:28px 14px;z-index:50;overflow:auto}
 .modal.open{display:flex}
-.sheet{background:#fff;border-radius:16px;width:640px;max-width:100%;padding:22px}
+.sheet{background:var(--card);color:var(--text);border-radius:16px;width:640px;max-width:100%;padding:22px}
 .sheet h3{font-size:18px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
 .form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .field{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--muted)}
 .field.full{grid-column:1/-1}
-.field input,.field select,.field textarea{color:var(--text);width:100%}
+.field input,.field select,.field textarea{width:100%}
 .sheet .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:11px 18px;border-radius:10px;font-size:14px;display:none;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+html[data-theme="dark"] .toast{background:#e2e8f0;color:#0f172a}
 .empty{padding:26px;text-align:center;color:var(--muted)}
 .note{font-size:12px;color:var(--muted);line-height:1.7}
-.kv{display:grid;grid-template-columns:120px 1fr;gap:8px 14px;font-size:14px}
+.kv{display:grid;grid-template-columns:130px 1fr;gap:8px 14px;font-size:14px}
 .kv dt{color:var(--muted)}
+.loading{padding:60px;text-align:center;color:var(--muted);font-size:15px}
 </style>
 </head>
 <body>
 <div class="layout">
   <aside class="sidebar">
-    <div class="logo"><h1>🏢 HRMS</h1><p>人力資源管理系統<br>Human Resource Management System</p></div>
+    <div class="logo"><h1>🏢 HRMS</h1><p data-i18n="brand_sub">人力資源管理系統<br>Human Resource Management System</p></div>
     <nav class="nav" id="nav">
-      <button data-page="dashboard" class="active">📊 儀表板</button>
-      <button data-page="employees">👥 員工管理</button>
-      <button data-page="departments">🏬 部門管理</button>
-      <button data-page="attendance">🕐 考勤管理</button>
-      <button data-page="leaves">🌴 請假管理</button>
-      <button data-page="payroll">💰 薪酬管理</button>
+      <button data-page="dashboard" class="active">📊 <span data-i18n="nav_dashboard">儀表板</span></button>
+      <button data-page="employees">👥 <span data-i18n="nav_employees">員工管理</span></button>
+      <button data-page="departments">🏬 <span data-i18n="nav_departments">部門管理</span></button>
+      <button data-page="attendance">🕐 <span data-i18n="nav_attendance">考勤管理</span></button>
+      <button data-page="leaves">🌴 <span data-i18n="nav_leaves">請假管理</span></button>
+      <button data-page="payroll">💰 <span data-i18n="nav_payroll">薪酬管理</span></button>
     </nav>
-    <div class="sidefoot">示範版 · 資料儲存在本機瀏覽器<br>（localStorage）<br><a href="#" id="resetData" style="color:#93c5fd">重設示範資料</a></div>
+    <div class="sidefoot">
+      <div class="uibtns">
+        <button id="themeBtn" onclick="toggleTheme()">🌙 <span data-i18n="theme_dark">深色模式</span></button>
+        <button id="langBtn" onclick="toggleLang()">🌐 English</button>
+      </div>
+      <span data-i18n="foot_note">示範版 · 資料儲存在 IndexedDB</span><br>
+      <a href="#" id="resetData" style="color:#93c5fd" data-i18n="reset_data">重設示範資料</a>
+    </div>
   </aside>
 
-  <main class="main">
+  <main class="main" id="mainArea"><div class="loading" id="loadingMsg">載入中… Loading…</div>
+
     <!-- Dashboard -->
-    <section class="page active" id="page-dashboard">
-      <div class="topbar"><div><h2>儀表板</h2><div class="sub" id="todayLine"></div></div><button class="btn" onclick="openEmpModal()">＋ 新增員工</button></div>
+    <section class="page active" id="page-dashboard" style="display:none">
+      <div class="topbar"><div><h2 data-i18n="nav_dashboard">儀表板</h2><div class="sub" id="todayLine"></div></div><button class="btn" onclick="openEmpModal()">＋ <span data-i18n="add_employee">新增員工</span></button></div>
       <div class="cards" id="statCards"></div>
       <div class="grid2">
-        <div class="panel"><h3>各部門人數</h3><div id="deptBars"></div></div>
-        <div class="panel"><h3>待批核請假</h3><div id="pendingLeaves"></div></div>
+        <div class="panel"><h3 data-i18n="dept_chart">各部門人數</h3><div id="deptBars"></div></div>
+        <div class="panel"><h3 data-i18n="pending_leaves">待批核請假</h3><div id="pendingLeaves"></div></div>
       </div>
-      <div class="panel"><h3>最近入職員工</h3><div id="recentEmp"></div></div>
+      <div class="panel"><h3 data-i18n="recent_emp">最近入職員工</h3><div id="recentEmp"></div></div>
     </section>
 
     <!-- Employees -->
     <section class="page" id="page-employees">
-      <div class="topbar"><div><h2>員工管理</h2><div class="sub">搜尋、新增、編輯及匯出員工資料</div></div><div><button class="btn ghost" onclick="exportCSV()">⬇ 匯出 CSV</button> <button class="btn" onclick="openEmpModal()">＋ 新增員工</button></div></div>
+      <div class="topbar"><div><h2 data-i18n="nav_employees">員工管理</h2><div class="sub" data-i18n="emp_sub">搜尋、新增、編輯及匯出員工資料</div></div><div><button class="btn ghost" onclick="exportCSV()">⬇ <span data-i18n="export_csv">匯出 CSV</span></button> <button class="btn" onclick="openEmpModal()">＋ <span data-i18n="add_employee">新增員工</span></button></div></div>
       <div class="panel">
         <div class="toolbar">
-          <input id="empSearch" placeholder="搜尋姓名 / 編號 / 職位…" oninput="renderEmployees()">
+          <input id="empSearch" data-i18n-ph="search_ph" placeholder="搜尋姓名 / 編號 / 職位…" oninput="renderEmployees()">
           <select id="empDeptFilter" onchange="renderEmployees()"></select>
-          <select id="empStatusFilter" onchange="renderEmployees()"><option value="">全部狀態</option><option>在職</option><option>請假中</option><option>已離職</option></select>
+          <select id="empStatusFilter" onchange="renderEmployees()"></select>
         </div>
-        <div style="overflow:auto"><table><thead><tr><th>員工</th><th>部門</th><th>職位</th><th>入職日期</th><th>月薪 (HK$)</th><th>狀態</th><th></th></tr></thead><tbody id="empTable"></tbody></table></div>
+        <div style="overflow:auto"><table><thead><tr><th data-i18n="th_employee">員工</th><th data-i18n="th_dept">部門</th><th data-i18n="th_position">職位</th><th data-i18n="th_join">入職日期</th><th data-i18n="th_salary">月薪 (HK$)</th><th data-i18n="th_status">狀態</th><th></th></tr></thead><tbody id="empTable"></tbody></table></div>
       </div>
     </section>
 
     <!-- Departments -->
     <section class="page" id="page-departments">
-      <div class="topbar"><div><h2>部門管理</h2><div class="sub">部門架構與人手概覽</div></div><button class="btn" onclick="openDeptModal()">＋ 新增部門</button></div>
+      <div class="topbar"><div><h2 data-i18n="nav_departments">部門管理</h2><div class="sub" data-i18n="dept_sub">部門架構與人手概覽</div></div><button class="btn" onclick="openDeptModal()">＋ <span data-i18n="add_dept">新增部門</span></button></div>
       <div class="cards" id="deptCards"></div>
     </section>
 
     <!-- Attendance -->
     <section class="page" id="page-attendance">
-      <div class="topbar"><div><h2>考勤管理</h2><div class="sub">今日打卡記錄（可即場模擬打卡）</div></div></div>
+      <div class="topbar"><div><h2 data-i18n="nav_attendance">考勤管理</h2><div class="sub" data-i18n="att_sub">今日打卡記錄（可即場模擬打卡）</div></div></div>
       <div class="panel">
-        <div class="toolbar"><select id="attEmp"></select><button class="btn green" onclick="clockIn()">上班打卡</button><button class="btn amber" onclick="clockOut()">下班打卡</button><span class="note">標準上班時間 09:00，遲於 09:00 會標示為遲到。</span></div>
-        <div style="overflow:auto"><table><thead><tr><th>員工</th><th>日期</th><th>上班</th><th>下班</th><th>狀態</th></tr></thead><tbody id="attTable"></tbody></table></div>
+        <div class="toolbar"><select id="attEmp"></select><button class="btn green" onclick="clockIn()" data-i18n="clock_in">上班打卡</button><button class="btn amber" onclick="clockOut()" data-i18n="clock_out">下班打卡</button><span class="note" data-i18n="att_note">標準上班時間 09:00，遲於 09:00 會標示為遲到。</span></div>
+        <div style="overflow:auto"><table><thead><tr><th data-i18n="th_employee">員工</th><th data-i18n="th_date">日期</th><th data-i18n="th_in">上班</th><th data-i18n="th_out">下班</th><th data-i18n="th_status">狀態</th></tr></thead><tbody id="attTable"></tbody></table></div>
       </div>
     </section>
 
     <!-- Leaves -->
     <section class="page" id="page-leaves">
-      <div class="topbar"><div><h2>請假管理</h2><div class="sub">請假申請、批核及假期餘額</div></div><button class="btn" onclick="openLeaveModal()">＋ 新增申請</button></div>
-      <div class="panel"><div style="overflow:auto"><table><thead><tr><th>員工</th><th>類型</th><th>日期</th><th>日數</th><th>原因</th><th>狀態</th><th></th></tr></thead><tbody id="leaveTable"></tbody></table></div></div>
-      <div class="panel"><h3>假期餘額（在職員工）</h3><div id="leaveBalance"></div></div>
+      <div class="topbar"><div><h2 data-i18n="nav_leaves">請假管理</h2><div class="sub" data-i18n="leave_sub">請假申請、批核及假期餘額</div></div><button class="btn" onclick="openLeaveModal()">＋ <span data-i18n="add_leave">新增申請</span></button></div>
+      <div class="panel"><div style="overflow:auto"><table><thead><tr><th data-i18n="th_employee">員工</th><th data-i18n="th_type">類型</th><th data-i18n="th_date">日期</th><th data-i18n="th_days">日數</th><th data-i18n="th_reason">原因</th><th data-i18n="th_status">狀態</th><th></th></tr></thead><tbody id="leaveTable"></tbody></table></div></div>
+      <div class="panel"><h3 data-i18n="leave_balance">假期餘額（在職員工）</h3><div id="leaveBalance"></div></div>
     </section>
 
     <!-- Payroll -->
     <section class="page" id="page-payroll">
-      <div class="topbar"><div><h2>薪酬管理</h2><div class="sub">本月薪金與強積金（MPF）計算</div></div><button class="btn ghost" onclick="exportPayroll()">⬇ 匯出薪酬 CSV</button></div>
+      <div class="topbar"><div><h2 data-i18n="nav_payroll">薪酬管理</h2><div class="sub" data-i18n="pay_sub">本月薪金與強積金（MPF）計算</div></div><button class="btn ghost" onclick="exportPayroll()">⬇ <span data-i18n="export_pay">匯出薪酬 CSV</span></button></div>
       <div class="cards" id="payCards"></div>
-      <div class="panel"><h3>批量調整薪酬</h3>
+      <div class="panel"><h3 data-i18n="bulk_title">批量調整薪酬</h3>
         <div class="toolbar">
           <select id="bulkScope" style="min-width:170px"></select>
-          <select id="bulkMode"><option value="percent">按百分比 (%)</option><option value="amount">按固定金額 (HK$)</option></select>
-          <input id="bulkValue" type="number" step="any" placeholder="例：5 代表 +5%／減薪入負數" style="flex:1;min-width:180px">
-          <button class="btn ghost" onclick="previewBulk()">預覽調整</button>
-          <button class="btn" id="bulkApplyBtn" onclick="applyBulk()" disabled style="opacity:.5">確認套用</button>
+          <select id="bulkMode"><option value="percent" data-i18n="bulk_percent">按百分比 (%)</option><option value="amount" data-i18n="bulk_amount">按固定金額 (HK$)</option></select>
+          <input id="bulkValue" type="number" step="any" data-i18n-ph="bulk_ph" placeholder="例：5 代表 +5%／減薪入負數" style="flex:1;min-width:180px">
+          <button class="btn ghost" onclick="previewBulk()" data-i18n="bulk_preview">預覽調整</button>
+          <button class="btn" id="bulkApplyBtn" onclick="applyBulk()" disabled style="opacity:.5" data-i18n="bulk_apply">確認套用</button>
         </div>
-        <p class="note">百分比可入負數（例如 -3 即減薪 3%）；固定金額同樣可入負數。新薪金會四捨五入至整數並且不會低於 HK$0。套用前必須先預覽，套用後可在下方調整記錄撤銷最近一次。</p>
+        <p class="note" data-i18n="bulk_note">百分比可入負數（例如 -3 即減薪 3%）；固定金額同樣可入負數。新薪金會四捨五入至整數並且不會低於 HK$0。套用前必須先預覽，套用後可在下方調整記錄撤銷最近一次。</p>
         <div id="bulkPreview"></div>
       </div>
-      <div class="panel"><h3>薪酬調整記錄</h3><div id="bulkHistory"></div></div>
-      <div class="panel"><div style="overflow:auto"><table><thead><tr><th>員工</th><th>基本月薪</th><th>僱員 MPF (5%)</th><th>僱主 MPF (5%)</th><th>實發薪金</th></tr></thead><tbody id="payTable"></tbody></table></div>
-      <p class="note">MPF 計算跟香港現行規則示範：僱主及僱員各供款入息 5%，每月供款上限各 HK$1,500（有關入息上限 HK$30,000）；月入低於 HK$7,100 僱員免供款、僱主仍須供款。此頁僅作系統示範，不構成薪酬或法例意見。</p></div>
+      <div class="panel"><h3 data-i18n="bulk_history">薪酬調整記錄</h3><div id="bulkHistory"></div></div>
+      <div class="panel"><div style="overflow:auto"><table><thead><tr><th data-i18n="th_employee">員工</th><th data-i18n="th_base">基本月薪</th><th data-i18n="th_emp_mpf">僱員 MPF (5%)</th><th data-i18n="th_er_mpf">僱主 MPF (5%)</th><th data-i18n="th_net">實發薪金</th></tr></thead><tbody id="payTable"></tbody></table></div>
+      <p class="note" data-i18n="mpf_note">MPF 計算跟香港現行規則示範：僱主及僱員各供款入息 5%，每月供款上限各 HK$1,500（有關入息上限 HK$30,000）；月入低於 HK$7,100 僱員免供款、僱主仍須供款。此頁僅作系統示範，不構成薪酬或法例意見。</p></div>
     </section>
   </main>
 </div>
@@ -156,43 +173,60 @@ tr:hover td{background:#f8fafc}
 <!-- Employee modal -->
 <div class="modal" id="empModal"><div class="sheet"><h3><span id="empModalTitle">新增員工</span><button class="btn ghost small" onclick="closeModal('empModal')">✕</button></h3>
 <form id="empForm" onsubmit="saveEmployee(event)"><div class="form">
-<div class="field"><label>中文姓名 *</label><input name="name" required></div>
-<div class="field"><label>英文姓名</label><input name="enName"></div>
-<div class="field"><label>電郵 *</label><input name="email" type="email" required></div>
-<div class="field"><label>電話</label><input name="phone"></div>
-<div class="field"><label>部門 *</label><select name="deptId" id="empFormDept" required></select></div>
-<div class="field"><label>職位 *</label><input name="position" required></div>
-<div class="field"><label>入職日期 *</label><input name="joinDate" type="date" required></div>
-<div class="field"><label>月薪 (HK$) *</label><input name="salary" type="number" min="0" step="100" required></div>
-<div class="field"><label>狀態</label><select name="status"><option>在職</option><option>請假中</option><option>已離職</option></select></div>
-<div class="field"><label>年假餘額（日）</label><input name="alBal" type="number" min="0" value="14"></div>
-</div><div class="actions"><button type="button" class="btn ghost" onclick="closeModal('empModal')">取消</button><button class="btn" type="submit">儲存</button></div></form></div></div>
+<div class="field"><label data-i18n="f_name">中文姓名 *</label><input name="name" required></div>
+<div class="field"><label data-i18n="f_enname">英文姓名</label><input name="enName"></div>
+<div class="field"><label data-i18n="f_email">電郵 *</label><input name="email" type="email" required></div>
+<div class="field"><label data-i18n="f_phone">電話</label><input name="phone"></div>
+<div class="field"><label data-i18n="th_dept">部門</label><select name="deptId" id="empFormDept" required></select></div>
+<div class="field"><label data-i18n="f_position">職位 *</label><input name="position" required></div>
+<div class="field"><label data-i18n="f_join">入職日期 *</label><input name="joinDate" type="date" required></div>
+<div class="field"><label data-i18n="f_salary">月薪 (HK$) *</label><input name="salary" type="number" min="0" step="100" required></div>
+<div class="field"><label data-i18n="th_status">狀態</label><select name="status" id="empFormStatus"></select></div>
+<div class="field"><label data-i18n="f_albal">年假餘額（日）</label><input name="alBal" type="number" min="0" value="14"></div>
+</div><div class="actions"><button type="button" class="btn ghost" onclick="closeModal('empModal')" data-i18n="cancel">取消</button><button class="btn" type="submit" data-i18n="save">儲存</button></div></form></div></div>
 
 <!-- Department modal -->
 <div class="modal" id="deptModal"><div class="sheet"><h3><span id="deptModalTitle">新增部門</span><button class="btn ghost small" onclick="closeModal('deptModal')">✕</button></h3>
 <form id="deptForm" onsubmit="saveDept(event)"><div class="form">
-<div class="field full"><label>部門名稱 *</label><input name="name" required></div>
-<div class="field full"><label>部門主管</label><select name="managerId" id="deptMgr"></select></div>
-<div class="field full"><label>描述</label><textarea name="desc" rows="2"></textarea></div>
-</div><div class="actions"><button type="button" class="btn ghost" onclick="closeModal('deptModal')">取消</button><button class="btn" type="submit">儲存</button></div></form></div></div>
+<div class="field full"><label data-i18n="f_dept_name">部門名稱 *</label><input name="name" required></div>
+<div class="field full"><label data-i18n="f_mgr">部門主管</label><select name="managerId" id="deptMgr"></select></div>
+<div class="field full"><label data-i18n="f_desc">描述</label><textarea name="desc" rows="2"></textarea></div>
+</div><div class="actions"><button type="button" class="btn ghost" onclick="closeModal('deptModal')" data-i18n="cancel">取消</button><button class="btn" type="submit" data-i18n="save">儲存</button></div></form></div></div>
 
 <!-- Leave modal -->
-<div class="modal" id="leaveModal"><div class="sheet"><h3>新增請假申請<button class="btn ghost small" onclick="closeModal('leaveModal')">✕</button></h3>
+<div class="modal" id="leaveModal"><div class="sheet"><h3><span data-i18n="add_leave">新增申請</span><button class="btn ghost small" onclick="closeModal('leaveModal')">✕</button></h3>
 <form onsubmit="saveLeave(event)"><div class="form">
-<div class="field"><label>員工 *</label><select name="empId" id="leaveEmp" required></select></div>
-<div class="field"><label>假期類型 *</label><select name="type"><option>年假</option><option>病假</option><option>事假</option><option>婚假</option><option>產假</option><option>陪產假</option></select></div>
-<div class="field"><label>開始日期 *</label><input name="start" type="date" required></div>
-<div class="field"><label>結束日期 *</label><input name="end" type="date" required></div>
-<div class="field full"><label>原因</label><textarea name="reason" rows="2"></textarea></div>
-</div><div class="actions"><button type="button" class="btn ghost" onclick="closeModal('leaveModal')">取消</button><button class="btn" type="submit">提交申請</button></div></form></div></div>
+<div class="field"><label data-i18n="th_employee">員工</label><select name="empId" id="leaveEmp" required></select></div>
+<div class="field"><label data-i18n="f_leave_type">假期類型 *</label><select name="type" id="leaveTypeSel"></select></div>
+<div class="field"><label data-i18n="f_start">開始日期 *</label><input name="start" type="date" required></div>
+<div class="field"><label data-i18n="f_end">結束日期 *</label><input name="end" type="date" required></div>
+<div class="field full"><label data-i18n="th_reason">原因</label><textarea name="reason" rows="2"></textarea></div>
+</div><div class="actions"><button type="button" class="btn ghost" onclick="closeModal('leaveModal')" data-i18n="cancel">取消</button><button class="btn" type="submit" data-i18n="submit_leave">提交申請</button></div></form></div></div>
 
 <!-- Detail modal -->
-<div class="modal" id="detailModal"><div class="sheet"><h3>員工詳情<button class="btn ghost small" onclick="closeModal('detailModal')">✕</button></h3><div id="detailBody"></div></div></div>
+<div class="modal" id="detailModal"><div class="sheet"><h3><span data-i18n="detail_title">員工詳情</span><button class="btn ghost small" onclick="closeModal('detailModal')">✕</button></h3><div id="detailBody"></div></div></div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const KEY='hrms_v1';
+/* ============ i18n ============ */
+const I18N={
+zh:{brand_sub:"人力資源管理系統<br>Human Resource Management System",nav_dashboard:"儀表板",nav_employees:"員工管理",nav_departments:"部門管理",nav_attendance:"考勤管理",nav_leaves:"請假管理",nav_payroll:"薪酬管理",theme_dark:"深色模式",theme_light:"淺色模式",foot_note:"示範版 · 資料儲存在 IndexedDB",reset_data:"重設示範資料",add_employee:"新增員工",add_dept:"新增部門",add_leave:"新增申請",dept_chart:"各部門人數",pending_leaves:"待批核請假",recent_emp:"最近入職員工",emp_sub:"搜尋、新增、編輯及匯出員工資料",dept_sub:"部門架構與人手概覽",att_sub:"今日打卡記錄（可即場模擬打卡）",leave_sub:"請假申請、批核及假期餘額",pay_sub:"本月薪金與強積金（MPF）計算",export_csv:"匯出 CSV",export_pay:"匯出薪酬 CSV",search_ph:"搜尋姓名 / 編號 / 職位…",all_depts:"全部部門",all_status:"全部狀態",th_employee:"員工",th_dept:"部門",th_position:"職位",th_join:"入職日期",th_salary:"月薪 (HK$)",th_status:"狀態",th_date:"日期",th_in:"上班",th_out:"下班",th_type:"類型",th_days:"日數",th_reason:"原因",th_base:"基本月薪",th_emp_mpf:"僱員 MPF (5%)",th_er_mpf:"僱主 MPF (5%)",th_net:"實發薪金",th_al:"年假餘額",th_sick:"病假餘額",clock_in:"上班打卡",clock_out:"下班打卡",att_note:"標準上班時間 09:00，遲於 09:00 會標示為遲到。",leave_balance:"假期餘額（在職員工）",bulk_title:"批量調整薪酬",bulk_percent:"按百分比 (%)",bulk_amount:"按固定金額 (HK$)",bulk_ph:"例：5 代表 +5%／減薪入負數",bulk_preview:"預覽調整",bulk_apply:"確認套用",bulk_note:"百分比可入負數（例如 -3 即減薪 3%）；固定金額同樣可入負數。新薪金會四捨五入至整數並且不會低於 HK$0。套用前必須先預覽，套用後可在下方調整記錄撤銷最近一次。",bulk_history:"薪酬調整記錄",bulk_none:"暫時未有批量調整記錄",bulk_all:"全部在職員工",mpf_note:"MPF 計算跟香港現行規則示範：僱主及僱員各供款入息 5%，每月供款上限各 HK$1,500（有關入息上限 HK$30,000）；月入低於 HK$7,100 僱員免供款、僱主仍須供款。此頁僅作系統示範，不構成薪酬或法例意見。",f_name:"中文姓名 *",f_enname:"英文姓名",f_email:"電郵 *",f_phone:"電話",f_position:"職位 *",f_join:"入職日期 *",f_salary:"月薪 (HK$) *",f_albal:"年假餘額（日）",f_dept_name:"部門名稱 *",f_mgr:"部門主管",f_desc:"描述",f_leave_type:"假期類型 *",f_start:"開始日期 *",f_end:"結束日期 *",cancel:"取消",save:"儲存",submit_leave:"提交申請",detail_title:"員工詳情",emp_new:"新增員工",emp_edit:"編輯員工",dept_new:"新增部門",dept_edit:"編輯部門",today_is:"今日係 ",stat_active:"👥 在職員工",stat_active_sub:"位員工記錄",stat_total_prefix:"共 ",stat_depts:"🏬 部門數目",stat_depts_sub:"涵蓋全公司架構",stat_onleave:"🌴 請假中",stat_pending_suffix:"宗待批核申請",stat_pending_prefix:"另有 ",stat_rate:"🕐 今日出勤率",stat_rate_sub:"今日已打卡 ",stat_avg:"💰 平均月薪",stat_avg_sub:"在職員工平均值",people:"人",days:"日",detail:"詳情",edit:"編輯",del:"刪除",approve:"批核",reject:"拒絕",undo:"撤銷",no_pending:"🎉 暫時冇待批核申請",no_emp:"搵唔到符合條件嘅員工",no_dept:"未有部門",no_att:"未有考勤記錄",no_leave:"未有請假申請",dept_word:"部門",mgr:"主管",mgr_none:"未指定",headcount:"人數",monthly_cost:"每月薪金支出",pay_total:"💵 本月薪金總額",pay_er:"🏢 僱主 MPF 總供款",pay_net:"👛 員工實發總額",pay_count:"👥 出糧人數",st_在職:"在職",st_請假中:"請假中",st_已離職:"已離職",st_待批核:"待批核",st_已批核:"已批核",st_已拒絕:"已拒絕",st_準時:"準時",st_遲到:"遲到",st_缺勤:"缺勤",lt_年假:"年假",lt_病假:"病假",lt_事假:"事假",lt_婚假:"婚假",lt_產假:"產假",lt_陪產假:"陪產假",d_id:"員工編號",d_name:"姓名",d_email:"電郵",d_phone:"電話",d_dept_pos:"部門 / 職位",d_join:"入職日期",d_salary:"月薪",d_status:"狀態",d_balance:"假期餘額",bal_text:"年假 {a} 日 · 病假 {s} 日",leave_al_suffix:"年假餘",bulk_th_before:"現時月薪",bulk_th_after:"調整後月薪",bulk_th_change:"變動",bulk_summary:"影響 {n} 位員工 · 每月薪金總額 HK$ {b} → HK$ {a}（{d} / 月，全年 {y}）",adj_effective:"已生效",adj_undone:"已撤銷",th_adj_date:"日期",th_adj_scope:"範圍",th_adj_change:"調整",th_adj_count:"人數",th_adj_total:"每月總額變化",msg_emp_updated:"員工資料已更新",msg_emp_added:"員工已新增",msg_emp_deleted:"已刪除員工",msg_dept_updated:"部門已更新",msg_dept_added:"部門已新增",msg_dept_deleted:"部門已刪除",msg_dept_blocked:"呢個部門仲有員工，未能刪除。請先將員工轉去其他部門。",msg_confirm_del_dept:"確定刪除呢個部門？",msg_confirm_del_emp:"確定刪除員工「{n}」？此動作不能復原。",msg_clocked_in:"上班打卡 ",msg_clocked_out:"下班打卡 ",msg_already_in:"今日已經打咗上班卡",msg_no_in:"今日未有上班記錄，或已經打咗下班卡",msg_leave_submitted:"請假申請已提交，等待批核",msg_leave_approved:"申請已批核",msg_leave_rejected:"申請已拒絕",msg_end_before_start:"結束日期不能早於開始日期",msg_csv_emp:"員工 CSV 已匯出",msg_csv_pay:"薪酬 CSV 已匯出",msg_bulk_invalid:"請輸入有效嘅調整數值（百分比或金額，可用負數代表減薪）",msg_bulk_pct:"百分比減幅唔可以去到或超過 100%",msg_bulk_none:"所選範圍冇在職員工",msg_bulk_previewed:"預覽已生成，核對後按「確認套用」",msg_bulk_applied:"批量薪酬調整已套用",msg_bulk_need_preview:"請先預覽調整",msg_bulk_confirm:"確定為「{s}」批量調整薪酬（{l}）？\n影響 {n} 位員工，每月總額 {b} → {a}。",msg_bulk_undo_confirm:"確定撤銷呢次批量調整？受影響員工嘅薪金會還原到調整前。",msg_bulk_undone:"已撤銷該次批量調整",msg_reset_confirm:"確定重設為示範資料？你新增/修改嘅資料會被清除。",msg_reset_done:"已重設示範資料",msg_migrated:"已將舊版 localStorage 資料遷移至 IndexedDB"},
+en:{brand_sub:"Human Resource Management System",nav_dashboard:"Dashboard",nav_employees:"Employees",nav_departments:"Departments",nav_attendance:"Attendance",nav_leaves:"Leave",nav_payroll:"Payroll",theme_dark:"Dark mode",theme_light:"Light mode",foot_note:"Demo · Data stored in IndexedDB",reset_data:"Reset demo data",add_employee:"Add Employee",add_dept:"Add Department",add_leave:"New Request",dept_chart:"Headcount by Department",pending_leaves:"Pending Leave Requests",recent_emp:"Most Recent Joiners",emp_sub:"Search, add, edit and export employee records",dept_sub:"Department structure and headcount overview",att_sub:"Today's clock-in records (try the simulation)",leave_sub:"Leave requests, approvals and balances",pay_sub:"Monthly payroll and MPF calculation",export_csv:"Export CSV",export_pay:"Export Payroll CSV",search_ph:"Search name / ID / position…",all_depts:"All Departments",all_status:"All Statuses",th_employee:"Employee",th_dept:"Department",th_position:"Position",th_join:"Join Date",th_salary:"Salary (HK$)",th_status:"Status",th_date:"Date",th_in:"Clock In",th_out:"Clock Out",th_type:"Type",th_days:"Days",th_reason:"Reason",th_base:"Base Salary",th_emp_mpf:"Employee MPF (5%)",th_er_mpf:"Employer MPF (5%)",th_net:"Net Pay",th_al:"Annual Leave Balance",th_sick:"Sick Leave Balance",clock_in:"Clock In",clock_out:"Clock Out",att_note:"Standard start time is 09:00. Clock-ins after 09:00 are marked late.",leave_balance:"Leave Balances (Active Employees)",bulk_title:"Bulk Salary Adjustment",bulk_percent:"By percentage (%)",bulk_amount:"By fixed amount (HK$)",bulk_ph:"e.g. 5 = +5% / use negative to cut",bulk_preview:"Preview",bulk_apply:"Apply",bulk_note:"Percentages may be negative (e.g. -3 = a 3% cut); fixed amounts may also be negative. New salaries are rounded to whole dollars and never below HK$0. You must preview before applying, and the latest adjustment can be undone from the history below.",bulk_history:"Adjustment History",bulk_none:"No bulk adjustments yet",bulk_all:"All Active Employees",mpf_note:"MPF is calculated following Hong Kong rules for demonstration: employer and employee each contribute 5% of relevant income, capped at HK$1,500 per month each (income cap HK$30,000); employees earning under HK$7,100 are exempt while the employer must still contribute. For demo only; not payroll or legal advice.",f_name:"Chinese Name *",f_enname:"English Name",f_email:"Email *",f_phone:"Phone",f_position:"Position *",f_join:"Join Date *",f_salary:"Monthly Salary (HK$) *",f_albal:"Annual Leave Balance (days)",f_dept_name:"Department Name *",f_mgr:"Department Head",f_desc:"Description",f_leave_type:"Leave Type *",f_start:"Start Date *",f_end:"End Date *",cancel:"Cancel",save:"Save",submit_leave:"Submit Request",detail_title:"Employee Details",emp_new:"Add Employee",emp_edit:"Edit Employee",dept_new:"Add Department",dept_edit:"Edit Department",today_is:"Today is ",stat_active:"👥 Active Employees",stat_active_sub:" employee records in total",stat_total_prefix:"",stat_depts:"🏬 Departments",stat_depts_sub:"Across the whole company",stat_onleave:"🌴 On Leave",stat_pending_suffix:" pending requests",stat_pending_prefix:"Plus ",stat_rate:"🕐 Attendance Today",stat_rate_sub:" clocked in today",stat_avg:"💰 Average Salary",stat_avg_sub:"Average of active employees",people:"",days:" days",detail:"Details",edit:"Edit",del:"Delete",approve:"Approve",reject:"Reject",undo:"Undo",no_pending:"🎉 No pending requests",no_emp:"No employees match the filters",no_dept:"No departments yet",no_att:"No attendance records",no_leave:"No leave requests",dept_word:"Department",mgr:"Head",mgr_none:"Not assigned",headcount:"Headcount",monthly_cost:"Monthly salary cost",pay_total:"💵 Total Payroll",pay_er:"🏢 Employer MPF Total",pay_net:"👛 Total Net Pay",pay_count:"👥 Paid Employees",st_在職:"Active",st_請假中:"On Leave",st_已離職:"Left",st_待批核:"Pending",st_已批核:"Approved",st_已拒絕:"Rejected",st_準時:"On Time",st_遲到:"Late",st_缺勤:"Absent",lt_年假:"Annual Leave",lt_病假:"Sick Leave",lt_事假:"Personal Leave",lt_婚假:"Marriage Leave",lt_產假:"Maternity Leave",lt_陪產假:"Paternity Leave",d_id:"Employee ID",d_name:"Name",d_email:"Email",d_phone:"Phone",d_dept_pos:"Department / Position",d_join:"Join Date",d_salary:"Salary",d_status:"Status",d_balance:"Leave Balance",bal_text:"Annual {a} days · Sick {s} days",leave_al_suffix:"AL left",bulk_th_before:"Current Salary",bulk_th_after:"New Salary",bulk_th_change:"Change",bulk_summary:"Affects {n} employees · Monthly total HK$ {b} → HK$ {a} ({d} / month, {y} per year)",adj_effective:"Effective",adj_undone:"Undone",th_adj_date:"Date",th_adj_scope:"Scope",th_adj_change:"Adjustment",th_adj_count:"People",th_adj_total:"Monthly Total Change",msg_emp_updated:"Employee updated",msg_emp_added:"Employee added",msg_dept_updated:"Department updated",msg_emp_deleted:"Employee deleted",msg_dept_added:"Department added",msg_dept_deleted:"Department deleted",msg_dept_blocked:"This department still has employees and cannot be deleted. Move them first.",msg_confirm_del_dept:"Delete this department?",msg_confirm_del_emp:"Delete employee “{n}”? This cannot be undone.",msg_clocked_in:"Clocked in at ",msg_clocked_out:"Clocked out at ",msg_already_in:"Already clocked in today",msg_no_in:"No clock-in record today, or already clocked out",msg_leave_submitted:"Leave request submitted for approval",msg_leave_approved:"Request approved",msg_leave_rejected:"Request rejected",msg_end_before_start:"End date cannot be earlier than start date",msg_csv_emp:"Employee CSV exported",msg_csv_pay:"Payroll CSV exported",msg_bulk_invalid:"Enter a valid adjustment value (percentage or amount; negative means a cut)",msg_bulk_pct:"A percentage cut cannot reach or exceed 100%",msg_bulk_none:"No active employees in the selected scope",msg_bulk_previewed:"Preview generated — check it, then Apply",msg_bulk_applied:"Bulk salary adjustment applied",msg_bulk_need_preview:"Please preview the adjustment first",msg_bulk_confirm:"Apply bulk salary adjustment ({l}) to “{s}”?\nAffects {n} employees, monthly total {b} → {a}.",msg_bulk_undo_confirm:"Undo this bulk adjustment? Affected salaries will be restored.",msg_bulk_undone:"Bulk adjustment undone",msg_reset_confirm:"Reset to demo data? Your changes will be cleared.",msg_reset_done:"Demo data reset",msg_migrated:"Legacy localStorage data migrated to IndexedDB"}
+};
+let LANG='zh', THEME='light';
+function t(k){return (I18N[LANG]&&I18N[LANG][k])||I18N.zh[k]||k}
+function st(s){return t('st_'+s)||s}
+function lt(s){return t('lt_'+s)||s}
+
+/* ============ IndexedDB storage ============ */
+const IDB_NAME='hrms-db', IDB_STORE='kv';
+function idbOpen(){return new Promise((res,rej)=>{const r=indexedDB.open(IDB_NAME,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(IDB_STORE))r.result.createObjectStore(IDB_STORE)};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function idbGet(key){const db=await idbOpen();return new Promise((res,rej)=>{const q=db.transaction(IDB_STORE,'readonly').objectStore(IDB_STORE).get(key);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
+async function idbSet(key,val){const db=await idbOpen();return new Promise((res,rej)=>{const q=db.transaction(IDB_STORE,'readwrite').objectStore(IDB_STORE).put(val,key);q.onsuccess=()=>res();q.onerror=()=>rej(q.error)})}
+async function idbDel(key){const db=await idbOpen();return new Promise((res,rej)=>{const q=db.transaction(IDB_STORE,'readwrite').objectStore(IDB_STORE).delete(key);q.onsuccess=()=>res();q.onerror=()=>rej(q.error)})}
+
+/* ============ Data ============ */
 const COLORS=['#2563eb','#0ea5a4','#7c3aed','#db2777','#ea580c','#16a34a','#0891b2','#ca8a04'];
 function seed(){
   const depts=[
@@ -223,25 +257,45 @@ function seed(){
     {id:'L3',empId:'E011',type:'年假',start:'2026-12-24',end:'2026-12-31',days:6,reason:'聖誕外遊',status:'待批核',applied:today}];
   return {depts,emps,att,leaves,salaryAdjustments:[],seq:{emp:13,dept:6,leave:4,att:100,adj:1}};
 }
-let DB=load();
-function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.emps){if(!Array.isArray(d.salaryAdjustments))d.salaryAdjustments=[];if(!d.seq)d.seq={emp:100,dept:100,leave:100,att:100};if(!d.seq.adj)d.seq.adj=d.salaryAdjustments.length+1;return d}}catch(e){} const s=seed();localStorage.setItem(KEY,JSON.stringify(s));return s}
-function save(){localStorage.setItem(KEY,JSON.stringify(DB))}
+function normalize(d){if(!Array.isArray(d.salaryAdjustments))d.salaryAdjustments=[];if(!d.seq)d.seq={emp:100,dept:100,leave:100,att:100,adj:1};if(!d.seq.adj)d.seq.adj=d.salaryAdjustments.length+1;return d}
+let DB=null;
+function save(){if(DB)idbSet('state',DB).catch(e=>console.error('IDB save failed',e))}
+async function savePrefs(){try{await idbSet('ui',{theme:THEME,lang:LANG})}catch(e){}}
 function $(id){return document.getElementById(id)}
 function fmt(n){return Number(n).toLocaleString('en-HK')}
 function deptName(id){const d=DB.depts.find(x=>x.id===id);return d?d.name:'—'}
 function empById(id){return DB.emps.find(x=>x.id===id)}
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-function toast(msg){const t=$('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2400)}
-function badge(st){const m={'在職':'b-green','請假中':'b-amber','已離職':'b-gray','已批核':'b-green','待批核':'b-amber','已拒絕':'b-red','準時':'b-green','遲到':'b-amber','缺勤':'b-red'};return `<span class="badge ${m[st]||'b-blue'}">${esc(st)}</span>`}
+function toast(msg){const el=$('toast');el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',2400)}
+function badge(s){const m={'在職':'b-green','請假中':'b-amber','已離職':'b-gray','已批核':'b-green','待批核':'b-amber','已拒絕':'b-red','準時':'b-green','遲到':'b-amber','缺勤':'b-red'};return `<span class="badge ${m[s]||'b-blue'}">${esc(st(s))}</span>`}
 function personCell(e){return `<div class="person"><span class="avatar" style="background:${e.color}">${esc(e.name[0]||'?')}</span><span>${esc(e.name)}<small>${esc(e.id)} · ${esc(e.enName||'')}</small></span></div>`}
 
-/* Navigation */
-$('nav').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+b.dataset.page));renderAll()});
-function goto(page){document.querySelector(`.nav button[data-page="${page}"]`).click()}
+/* ============ Theme & Language ============ */
+function applyTheme(){document.documentElement.dataset.theme=THEME;document.querySelector('#themeBtn span').textContent=t(THEME==='dark'?'theme_light':'theme_dark');$('themeBtn').firstChild.textContent=THEME==='dark'?'☀️ ':'🌙 '}
+function toggleTheme(){THEME=THEME==='dark'?'light':'dark';applyTheme();savePrefs()}
+function applyI18n(){
+  document.documentElement.lang=LANG==='zh'?'zh-HK':'en';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{el.innerHTML=t(el.dataset.i18n)});
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{el.placeholder=t(el.dataset.i18nPh)});
+  $('langBtn').textContent=LANG==='zh'?'🌐 English':'🌐 繁體中文';
+  applyTheme();
+  buildStaticSelects();
+}
+function toggleLang(){LANG=LANG==='zh'?'en':'zh';applyI18n();if(DB)renderAll();savePrefs()}
+function buildStaticSelects(){
+  const cur=$('empStatusFilter').value;
+  $('empStatusFilter').innerHTML=`<option value="">${t('all_status')}</option>`+['在職','請假中','已離職'].map(s=>`<option value="${s}">${st(s)}</option>`).join('');
+  $('empStatusFilter').value=cur;
+  $('empFormStatus').innerHTML=['在職','請假中','已離職'].map(s=>`<option value="${s}">${st(s)}</option>`).join('');
+  $('leaveTypeSel').innerHTML=['年假','病假','事假','婚假','產假','陪產假'].map(s=>`<option value="${s}">${lt(s)}</option>`).join('');
+}
 
-/* Dashboard */
+/* ============ Navigation ============ */
+$('nav').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+b.dataset.page));if(DB)renderAll()});
+
+/* ============ Dashboard ============ */
 function renderDashboard(){
-  $('todayLine').textContent='今日係 '+new Date().toLocaleDateString('zh-HK',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+  $('todayLine').textContent=t('today_is')+new Date().toLocaleDateString(LANG==='zh'?'zh-HK':'en-GB',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
   const active=DB.emps.filter(e=>e.status!=='已離職');
   const onLeave=DB.emps.filter(e=>e.status==='請假中').length;
   const pending=DB.leaves.filter(l=>l.status==='待批核').length;
@@ -250,123 +304,143 @@ function renderDashboard(){
   const rate=active.length?Math.round(attToday.filter(a=>a.in).length/active.length*100):0;
   const avg=active.length?Math.round(active.reduce((s,e)=>s+e.salary,0)/active.length):0;
   $('statCards').innerHTML=[
-    ['👥 在職員工',active.length,'共 '+DB.emps.length+' 位員工記錄'],
-    ['🏬 部門數目',DB.depts.length,'涵蓋全公司架構'],
-    ['🌴 請假中',onLeave,'另有 '+pending+' 宗待批核申請'],
-    ['🕐 今日出勤率',rate+'%','今日已打卡 '+attToday.length+' 人'],
-    ['💰 平均月薪','HK$'+fmt(avg),'在職員工平均值']
+    [t('stat_active'),active.length,t('stat_total_prefix')+DB.emps.length+t('stat_active_sub')],
+    [t('stat_depts'),DB.depts.length,t('stat_depts_sub')],
+    [t('stat_onleave'),onLeave,t('stat_pending_prefix')+pending+' '+t('stat_pending_suffix')],
+    [t('stat_rate'),rate+'%',attToday.length+t('stat_rate_sub')],
+    [t('stat_avg'),'HK$'+fmt(avg),t('stat_avg_sub')]
   ].map(c=>`<div class="card"><div class="k">${c[0]}</div><div class="v">${c[1]}</div><div class="d">${c[2]}</div></div>`).join('');
   const max=Math.max(1,...DB.depts.map(d=>DB.emps.filter(e=>e.deptId===d.id&&e.status!=='已離職').length));
-  $('deptBars').innerHTML=DB.depts.map(d=>{const n=DB.emps.filter(e=>e.deptId===d.id&&e.status!=='已離職').length;return `<div class="bar-row"><span class="name">${esc(d.name)}</span><span class="bar-track"><span class="bar-fill" style="width:${n/max*100}%"></span></span><span class="num">${n} 人</span></div>`}).join('')||'<div class="empty">未有部門</div>';
+  $('deptBars').innerHTML=DB.depts.map(d=>{const n=DB.emps.filter(e=>e.deptId===d.id&&e.status!=='已離職').length;return `<div class="bar-row"><span class="name">${esc(d.name)}</span><span class="bar-track"><span class="bar-fill" style="width:${n/max*100}%"></span></span><span class="num">${n} ${t('people')}</span></div>`}).join('')||`<div class="empty">${t('no_dept')}</div>`;
   const pend=DB.leaves.filter(l=>l.status==='待批核');
-  $('pendingLeaves').innerHTML=pend.length?pend.map(l=>{const e=empById(l.empId);return `<div class="bar-row"><span style="flex:1">${esc(e?e.name:'?')} · ${esc(l.type)} ${esc(l.start)} 起 ${l.days} 日</span><button class="btn small green" onclick="decideLeave('${l.id}',true)">批核</button> <button class="btn small danger" onclick="decideLeave('${l.id}',false)">拒絕</button></div>`}).join(''):'<div class="empty">🎉 暫時冇待批核申請</div>';
+  $('pendingLeaves').innerHTML=pend.length?pend.map(l=>{const e=empById(l.empId);return `<div class="bar-row"><span style="flex:1">${esc(e?e.name:'?')} · ${esc(lt(l.type))} ${esc(l.start)} · ${l.days}${t('days')}</span><button class="btn small green" onclick="decideLeave('${l.id}',true)">${t('approve')}</button> <button class="btn small danger" onclick="decideLeave('${l.id}',false)">${t('reject')}</button></div>`}).join(''):`<div class="empty">${t('no_pending')}</div>`;
   const recent=[...DB.emps].sort((a,b)=>b.joinDate.localeCompare(a.joinDate)).slice(0,5);
   $('recentEmp').innerHTML=`<table><tbody>${recent.map(e=>`<tr><td>${personCell(e)}</td><td>${esc(deptName(e.deptId))}</td><td>${esc(e.position)}</td><td>${esc(e.joinDate)}</td></tr>`).join('')}</tbody></table>`;
 }
 
-/* Employees */
+/* ============ Employees ============ */
 function fillDeptSelects(){
-  const opts='<option value="">全部部門</option>'+DB.depts.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
-  $('empDeptFilter').innerHTML=opts;
+  $('empDeptFilter').innerHTML=`<option value="">${t('all_depts')}</option>`+DB.depts.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
   $('empFormDept').innerHTML=DB.depts.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
-  $('deptMgr').innerHTML='<option value="">（未指定）</option>'+DB.emps.filter(e=>e.status!=='已離職').map(e=>`<option value="${e.id}">${esc(e.name)}（${esc(deptName(e.deptId))}）</option>`).join('');
-  $('bulkScope').innerHTML='<option value="ALL">全部在職員工</option>'+DB.depts.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
+  $('deptMgr').innerHTML=`<option value="">（${t('mgr_none')}）</option>`+DB.emps.filter(e=>e.status!=='已離職').map(e=>`<option value="${e.id}">${esc(e.name)}（${esc(deptName(e.deptId))}）</option>`).join('');
+  $('bulkScope').innerHTML=`<option value="ALL">${t('bulk_all')}</option>`+DB.depts.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
   $('attEmp').innerHTML=DB.emps.filter(e=>e.status!=='已離職').map(e=>`<option value="${e.id}">${esc(e.name)}（${esc(deptName(e.deptId))}）</option>`).join('');
-  $('leaveEmp').innerHTML=DB.emps.filter(e=>e.status!=='已離職').map(e=>`<option value="${e.id}">${esc(e.name)}（年假餘 ${e.alBal} 日）</option>`).join('');
+  $('leaveEmp').innerHTML=DB.emps.filter(e=>e.status!=='已離職').map(e=>`<option value="${e.id}">${esc(e.name)}（${t('leave_al_suffix')} ${e.alBal}）</option>`).join('');
 }
 function renderEmployees(){
   const q=($('empSearch').value||'').toLowerCase(),df=$('empDeptFilter').value,sf=$('empStatusFilter').value;
   const list=DB.emps.filter(e=>(!q||(e.name+e.id+e.position+(e.enName||'')).toLowerCase().includes(q))&&(!df||e.deptId===df)&&(!sf||e.status===sf));
-  $('empTable').innerHTML=list.length?list.map(e=>`<tr><td>${personCell(e)}</td><td>${esc(deptName(e.deptId))}</td><td>${esc(e.position)}</td><td>${esc(e.joinDate)}</td><td>${fmt(e.salary)}</td><td>${badge(e.status)}</td><td style="white-space:nowrap"><button class="btn small ghost" onclick="viewEmp('${e.id}')">詳情</button> <button class="btn small ghost" onclick="openEmpModal('${e.id}')">編輯</button> <button class="btn small danger" onclick="delEmp('${e.id}')">刪除</button></td></tr>`).join(''):'<tr><td colspan="7"><div class="empty">搵唔到符合條件嘅員工</div></td></tr>';
+  $('empTable').innerHTML=list.length?list.map(e=>`<tr><td>${personCell(e)}</td><td>${esc(deptName(e.deptId))}</td><td>${esc(e.position)}</td><td>${esc(e.joinDate)}</td><td>${fmt(e.salary)}</td><td>${badge(e.status)}</td><td style="white-space:nowrap"><button class="btn small ghost" onclick="viewEmp('${e.id}')">${t('detail')}</button> <button class="btn small ghost" onclick="openEmpModal('${e.id}')">${t('edit')}</button> <button class="btn small danger" onclick="delEmp('${e.id}')">${t('del')}</button></td></tr>`).join(''):`<tr><td colspan="7"><div class="empty">${t('no_emp')}</div></td></tr>`;
 }
 let editingEmp=null;
-function openEmpModal(id){editingEmp=id||null;const f=$('empForm');f.reset();$('empModalTitle').textContent=id?'編輯員工':'新增員工';if(id){const e=empById(id);f.name.value=e.name;f.enName.value=e.enName||'';f.email.value=e.email;f.phone.value=e.phone||'';f.deptId.value=e.deptId;f.position.value=e.position;f.joinDate.value=e.joinDate;f.salary.value=e.salary;f.status.value=e.status;f.alBal.value=e.alBal}$('empModal').classList.add('open')}
+function openEmpModal(id){editingEmp=id||null;const f=$('empForm');f.reset();buildStaticSelects();$('empModalTitle').textContent=t(id?'emp_edit':'emp_new');if(id){const e=empById(id);f.name.value=e.name;f.enName.value=e.enName||'';f.email.value=e.email;f.phone.value=e.phone||'';f.deptId.value=e.deptId;f.position.value=e.position;f.joinDate.value=e.joinDate;f.salary.value=e.salary;f.status.value=e.status;f.alBal.value=e.alBal}$('empModal').classList.add('open')}
 function saveEmployee(ev){ev.preventDefault();const f=new FormData(ev.target);const data={name:f.get('name'),enName:f.get('enName'),email:f.get('email'),phone:f.get('phone'),deptId:f.get('deptId'),position:f.get('position'),joinDate:f.get('joinDate'),salary:Number(f.get('salary')),status:f.get('status'),alBal:Number(f.get('alBal'))};
-  if(editingEmp){Object.assign(empById(editingEmp),data);toast('員工資料已更新')}else{DB.emps.push({id:'E'+String(DB.seq.emp++).padStart(3,'0'),sickBal:10,color:COLORS[DB.emps.length%COLORS.length],...data});toast('員工已新增')}
+  if(editingEmp){Object.assign(empById(editingEmp),data);toast(t('msg_emp_updated'))}else{DB.emps.push({id:'E'+String(DB.seq.emp++).padStart(3,'0'),sickBal:10,color:COLORS[DB.emps.length%COLORS.length],...data});toast(t('msg_emp_added'))}
   save();closeModal('empModal');renderAll()}
-function delEmp(id){const e=empById(id);if(!confirm('確定刪除員工「'+e.name+'」？此動作不能復原。'))return;DB.emps=DB.emps.filter(x=>x.id!==id);save();renderAll();toast('已刪除 '+e.name)}
-function viewEmp(id){const e=empById(id);$('detailBody').innerHTML=`<dl class="kv"><dt>員工編號</dt><dd>${esc(e.id)}</dd><dt>姓名</dt><dd>${esc(e.name)}（${esc(e.enName||'')}）</dd><dt>電郵</dt><dd>${esc(e.email)}</dd><dt>電話</dt><dd>${esc(e.phone||'—')}</dd><dt>部門 / 職位</dt><dd>${esc(deptName(e.deptId))} / ${esc(e.position)}</dd><dt>入職日期</dt><dd>${esc(e.joinDate)}</dd><dt>月薪</dt><dd>HK$ ${fmt(e.salary)}</dd><dt>狀態</dt><dd>${badge(e.status)}</dd><dt>假期餘額</dt><dd>年假 ${e.alBal} 日 · 病假 ${e.sickBal} 日</dd></dl>`;$('detailModal').classList.add('open')}
-function exportCSV(){const rows=[['編號','姓名','英文名','電郵','電話','部門','職位','入職日期','月薪','狀態'],...DB.emps.map(e=>[e.id,e.name,e.enName,e.email,e.phone,deptName(e.deptId),e.position,e.joinDate,e.salary,e.status])];downloadCSV(rows,'employees.csv');toast('員工 CSV 已匯出')}
-function exportPayroll(){const rows=[['編號','姓名','部門','基本月薪','僱員MPF','僱主MPF','實發薪金'],...payrollRows().map(r=>[r.e.id,r.e.name,deptName(r.e.deptId),r.base,r.empMpf,r.erMpf,r.net])];downloadCSV(rows,'payroll.csv');toast('薪酬 CSV 已匯出')}
+function delEmp(id){const e=empById(id);if(!confirm(t('msg_confirm_del_emp').replace('{n}',e.name)))return;DB.emps=DB.emps.filter(x=>x.id!==id);save();renderAll();toast(t('msg_emp_deleted')+' '+e.name)}
+function viewEmp(id){const e=empById(id);$('detailBody').innerHTML=`<dl class="kv"><dt>${t('d_id')}</dt><dd>${esc(e.id)}</dd><dt>${t('d_name')}</dt><dd>${esc(e.name)}（${esc(e.enName||'')}）</dd><dt>${t('d_email')}</dt><dd>${esc(e.email)}</dd><dt>${t('d_phone')}</dt><dd>${esc(e.phone||'—')}</dd><dt>${t('d_dept_pos')}</dt><dd>${esc(deptName(e.deptId))} / ${esc(e.position)}</dd><dt>${t('d_join')}</dt><dd>${esc(e.joinDate)}</dd><dt>${t('d_salary')}</dt><dd>HK$ ${fmt(e.salary)}</dd><dt>${t('d_status')}</dt><dd>${badge(e.status)}</dd><dt>${t('d_balance')}</dt><dd>${t('bal_text').replace('{a}',e.alBal).replace('{s}',e.sickBal)}</dd></dl>`;$('detailModal').classList.add('open')}
+function exportCSV(){const rows=[['ID','Name','English Name','Email','Phone','Department','Position','Join Date','Salary','Status'],...DB.emps.map(e=>[e.id,e.name,e.enName,e.email,e.phone,deptName(e.deptId),e.position,e.joinDate,e.salary,e.status])];downloadCSV(rows,'employees.csv');toast(t('msg_csv_emp'))}
+function exportPayroll(){const rows=[['ID','Name','Department','Base Salary','Employee MPF','Employer MPF','Net Pay'],...payrollRows().map(r=>[r.e.id,r.e.name,deptName(r.e.deptId),r.base,r.empMpf,r.erMpf,r.net])];downloadCSV(rows,'payroll.csv');toast(t('msg_csv_pay'))}
 function downloadCSV(rows,name){const csv=rows.map(r=>r.map(c=>'"'+String(c??'').replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download=name;a.click()}
 
-/* Departments */
+/* ============ Departments ============ */
 function renderDepts(){
-  $('deptCards').innerHTML=DB.depts.map(d=>{const members=DB.emps.filter(e=>e.deptId===d.id&&e.status!=='已離職');const mgr=empById(d.managerId);const total=members.reduce((s,e)=>s+e.salary,0);return `<div class="card"><div class="k">🏬 部門</div><div style="font-size:19px;font-weight:700;margin:6px 0">${esc(d.name)}</div><div class="d" style="line-height:1.8">主管：${mgr?esc(mgr.name):'未指定'}<br>人數：${members.length} 人<br>每月薪金支出：HK$ ${fmt(total)}<br>${esc(d.desc||'')}</div><div style="margin-top:10px"><button class="btn small ghost" onclick="openDeptModal('${d.id}')">編輯</button> <button class="btn small danger" onclick="delDept('${d.id}')">刪除</button></div></div>`}).join('')||'<div class="empty">未有部門</div>';
+  $('deptCards').innerHTML=DB.depts.map(d=>{const members=DB.emps.filter(e=>e.deptId===d.id&&e.status!=='已離職');const mgr=empById(d.managerId);const total=members.reduce((s,e)=>s+e.salary,0);return `<div class="card"><div class="k">🏬 ${t('dept_word')}</div><div style="font-size:19px;font-weight:700;margin:6px 0">${esc(d.name)}</div><div class="d" style="line-height:1.8">${t('mgr')}：${mgr?esc(mgr.name):t('mgr_none')}<br>${t('headcount')}：${members.length} ${t('people')}<br>${t('monthly_cost')}：HK$ ${fmt(total)}<br>${esc(d.desc||'')}</div><div style="margin-top:10px"><button class="btn small ghost" onclick="openDeptModal('${d.id}')">${t('edit')}</button> <button class="btn small danger" onclick="delDept('${d.id}')">${t('del')}</button></div></div>`}).join('')||`<div class="empty">${t('no_dept')}</div>`;
 }
 let editingDept=null;
-function openDeptModal(id){editingDept=id||null;const f=$('deptForm');f.reset();$('deptModalTitle').textContent=id?'編輯部門':'新增部門';fillDeptSelects();if(id){const d=DB.depts.find(x=>x.id===id);f.name.value=d.name;f.managerId.value=d.managerId||'';f.desc.value=d.desc||''}$('deptModal').classList.add('open')}
-function saveDept(ev){ev.preventDefault();const f=new FormData(ev.target);const data={name:f.get('name'),managerId:f.get('managerId'),desc:f.get('desc')};if(editingDept){Object.assign(DB.depts.find(x=>x.id===editingDept),data);toast('部門已更新')}else{DB.depts.push({id:'D'+(DB.seq.dept++),...data});toast('部門已新增')}save();closeModal('deptModal');renderAll()}
-function delDept(id){if(DB.emps.some(e=>e.deptId===id)){alert('呢個部門仲有員工，未能刪除。請先將員工轉去其他部門。');return}if(!confirm('確定刪除呢個部門？'))return;DB.depts=DB.depts.filter(x=>x.id!==id);save();renderAll();toast('部門已刪除')}
+function openDeptModal(id){editingDept=id||null;const f=$('deptForm');f.reset();$('deptModalTitle').textContent=t(id?'dept_edit':'dept_new');fillDeptSelects();if(id){const d=DB.depts.find(x=>x.id===id);f.name.value=d.name;f.managerId.value=d.managerId||'';f.desc.value=d.desc||''}$('deptModal').classList.add('open')}
+function saveDept(ev){ev.preventDefault();const f=new FormData(ev.target);const data={name:f.get('name'),managerId:f.get('managerId'),desc:f.get('desc')};if(editingDept){Object.assign(DB.depts.find(x=>x.id===editingDept),data);toast(t('msg_dept_updated'))}else{DB.depts.push({id:'D'+(DB.seq.dept++),...data});toast(t('msg_dept_added'))}save();closeModal('deptModal');renderAll()}
+function delDept(id){if(DB.emps.some(e=>e.deptId===id)){alert(t('msg_dept_blocked'));return}if(!confirm(t('msg_confirm_del_dept')))return;DB.depts=DB.depts.filter(x=>x.id!==id);save();renderAll();toast(t('msg_dept_deleted'))}
 
-/* Attendance */
+/* ============ Attendance ============ */
 function renderAtt(){
   const list=[...DB.att].sort((a,b)=>b.date.localeCompare(a.date)||a.empId.localeCompare(b.empId)).slice(0,60);
-  $('attTable').innerHTML=list.length?list.map(a=>{const e=empById(a.empId);return `<tr><td>${e?personCell(e):esc(a.empId)}</td><td>${esc(a.date)}</td><td>${esc(a.in||'—')}</td><td>${esc(a.out||'—')}</td><td>${badge(a.status)}</td></tr>`}).join(''):'<tr><td colspan="5"><div class="empty">未有考勤記錄</div></td></tr>';
+  $('attTable').innerHTML=list.length?list.map(a=>{const e=empById(a.empId);return `<tr><td>${e?personCell(e):esc(a.empId)}</td><td>${esc(a.date)}</td><td>${esc(a.in||'—')}</td><td>${esc(a.out||'—')}</td><td>${badge(a.status)}</td></tr>`}).join(''):`<tr><td colspan="5"><div class="empty">${t('no_att')}</div></td></tr>`;
 }
 function nowTime(){const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
-function clockIn(){const id=$('attEmp').value;const today=new Date().toISOString().slice(0,10);if(DB.att.some(a=>a.empId===id&&a.date===today&&a.in)){toast('今日已經打咗上班卡');return}const t=nowTime();DB.att.push({id:'A'+(DB.seq.att++),empId:id,date:today,in:t,out:'',status:t<='09:00'?'準時':'遲到'});save();renderAll();toast('上班打卡 '+t)}
-function clockOut(){const id=$('attEmp').value;const today=new Date().toISOString().slice(0,10);const rec=DB.att.find(a=>a.empId===id&&a.date===today&&a.in&&!a.out);if(!rec){toast('今日未有上班記錄，或已經打咗下班卡');return}rec.out=nowTime();save();renderAll();toast('下班打卡 '+rec.out)}
+function clockIn(){const id=$('attEmp').value;const today=new Date().toISOString().slice(0,10);if(DB.att.some(a=>a.empId===id&&a.date===today&&a.in)){toast(t('msg_already_in'));return}const tm=nowTime();DB.att.push({id:'A'+(DB.seq.att++),empId:id,date:today,in:tm,out:'',status:tm<='09:00'?'準時':'遲到'});save();renderAll();toast(t('msg_clocked_in')+tm)}
+function clockOut(){const id=$('attEmp').value;const today=new Date().toISOString().slice(0,10);const rec=DB.att.find(a=>a.empId===id&&a.date===today&&a.in&&!a.out);if(!rec){toast(t('msg_no_in'));return}rec.out=nowTime();save();renderAll();toast(t('msg_clocked_out')+rec.out)}
 
-/* Leaves */
+/* ============ Leaves ============ */
 function renderLeaves(){
-  $('leaveTable').innerHTML=DB.leaves.length?[...DB.leaves].reverse().map(l=>{const e=empById(l.empId);return `<tr><td>${e?personCell(e):esc(l.empId)}</td><td>${esc(l.type)}</td><td>${esc(l.start)} 至 ${esc(l.end)}</td><td>${l.days}</td><td>${esc(l.reason||'—')}</td><td>${badge(l.status)}</td><td style="white-space:nowrap">${l.status==='待批核'?`<button class="btn small green" onclick="decideLeave('${l.id}',true)">批核</button> <button class="btn small danger" onclick="decideLeave('${l.id}',false)">拒絕</button>`:''}</td></tr>`}).join(''):'<tr><td colspan="7"><div class="empty">未有請假申請</div></td></tr>';
-  $('leaveBalance').innerHTML=`<table><thead><tr><th>員工</th><th>年假餘額</th><th>病假餘額</th></tr></thead><tbody>${DB.emps.filter(e=>e.status!=='已離職').map(e=>`<tr><td>${personCell(e)}</td><td>${e.alBal} 日</td><td>${e.sickBal} 日</td></tr>`).join('')}</tbody></table>`;
+  $('leaveTable').innerHTML=DB.leaves.length?[...DB.leaves].reverse().map(l=>{const e=empById(l.empId);return `<tr><td>${e?personCell(e):esc(l.empId)}</td><td>${esc(lt(l.type))}</td><td>${esc(l.start)} – ${esc(l.end)}</td><td>${l.days}</td><td>${esc(l.reason||'—')}</td><td>${badge(l.status)}</td><td style="white-space:nowrap">${l.status==='待批核'?`<button class="btn small green" onclick="decideLeave('${l.id}',true)">${t('approve')}</button> <button class="btn small danger" onclick="decideLeave('${l.id}',false)">${t('reject')}</button>`:''}</td></tr>`}).join(''):`<tr><td colspan="7"><div class="empty">${t('no_leave')}</div></td></tr>`;
+  $('leaveBalance').innerHTML=`<table><thead><tr><th>${t('th_employee')}</th><th>${t('th_al')}</th><th>${t('th_sick')}</th></tr></thead><tbody>${DB.emps.filter(e=>e.status!=='已離職').map(e=>`<tr><td>${personCell(e)}</td><td>${e.alBal}</td><td>${e.sickBal}</td></tr>`).join('')}</tbody></table>`;
 }
-function openLeaveModal(){$('leaveModal').classList.add('open')}
-function saveLeave(ev){ev.preventDefault();const f=new FormData(ev.target);const start=f.get('start'),end=f.get('end');if(end<start){alert('結束日期不能早於開始日期');return}const days=Math.round((new Date(end)-new Date(start))/86400000)+1;DB.leaves.push({id:'L'+(DB.seq.leave++),empId:f.get('empId'),type:f.get('type'),start,end,days,reason:f.get('reason'),status:'待批核',applied:new Date().toISOString().slice(0,10)});save();closeModal('leaveModal');renderAll();toast('請假申請已提交，等待批核')}
-function decideLeave(id,ok){const l=DB.leaves.find(x=>x.id===id);if(!l||l.status!=='待批核')return;l.status=ok?'已批核':'已拒絕';if(ok){const e=empById(l.empId);if(e){if(l.type==='年假')e.alBal=Math.max(0,e.alBal-l.days);if(l.type==='病假')e.sickBal=Math.max(0,e.sickBal-l.days)}}save();renderAll();toast(ok?'申請已批核':'申請已拒絕')}
+function openLeaveModal(){buildStaticSelects();$('leaveModal').classList.add('open')}
+function saveLeave(ev){ev.preventDefault();const f=new FormData(ev.target);const start=f.get('start'),end=f.get('end');if(end<start){alert(t('msg_end_before_start'));return}const days=Math.round((new Date(end)-new Date(start))/86400000)+1;DB.leaves.push({id:'L'+(DB.seq.leave++),empId:f.get('empId'),type:f.get('type'),start,end,days,reason:f.get('reason'),status:'待批核',applied:new Date().toISOString().slice(0,10)});save();closeModal('leaveModal');renderAll();toast(t('msg_leave_submitted'))}
+function decideLeave(id,ok){const l=DB.leaves.find(x=>x.id===id);if(!l||l.status!=='待批核')return;l.status=ok?'已批核':'已拒絕';if(ok){const e=empById(l.empId);if(e){if(l.type==='年假')e.alBal=Math.max(0,e.alBal-l.days);if(l.type==='病假')e.sickBal=Math.max(0,e.sickBal-l.days)}}save();renderAll();toast(t(ok?'msg_leave_approved':'msg_leave_rejected'))}
 
-/* Payroll */
+/* ============ Payroll & bulk adjustment ============ */
 function mpf(salary,isEmployee){if(salary<7100)return isEmployee?0:Math.round(salary*0.05);return Math.min(1500,Math.round(salary*0.05))}
 function payrollRows(){return DB.emps.filter(e=>e.status!=='已離職').map(e=>{const empMpf=mpf(e.salary,true),erMpf=mpf(e.salary,false);return{e,base:e.salary,empMpf,erMpf,net:e.salary-empMpf}})}
 function renderPayroll(){
   const rows=payrollRows();const total=rows.reduce((s,r)=>s+r.base,0),er=rows.reduce((s,r)=>s+r.erMpf,0),net=rows.reduce((s,r)=>s+r.net,0);
-  $('payCards').innerHTML=[['💵 本月薪金總額','HK$'+fmt(total)],['🏢 僱主 MPF 總供款','HK$'+fmt(er)],['👛 員工實發總額','HK$'+fmt(net)],['👥 出糧人數',rows.length+' 人']].map(c=>`<div class="card"><div class="k">${c[0]}</div><div class="v" style="font-size:23px">${c[1]}</div></div>`).join('');
+  $('payCards').innerHTML=[[t('pay_total'),'HK$'+fmt(total)],[t('pay_er'),'HK$'+fmt(er)],[t('pay_net'),'HK$'+fmt(net)],[t('pay_count'),rows.length+' '+t('people')]].map(c=>`<div class="card"><div class="k">${c[0]}</div><div class="v" style="font-size:23px">${c[1]}</div></div>`).join('');
   $('payTable').innerHTML=rows.map(r=>`<tr><td>${personCell(r.e)}</td><td>HK$ ${fmt(r.base)}</td><td>HK$ ${fmt(r.empMpf)}</td><td>HK$ ${fmt(r.erMpf)}</td><td><b>HK$ ${fmt(r.net)}</b></td></tr>`).join('');
   renderBulkHistory();
 }
-
-/* Bulk salary adjustment */
 let bulkPlan=null;
 function bulkTargets(){const scope=$('bulkScope').value;return DB.emps.filter(e=>e.status!=='已離職'&&(scope==='ALL'||e.deptId===scope))}
 function bulkNewSalary(old,mode,val){let n=mode==='percent'?old*(1+val/100):old+val;n=Math.round(n);return Math.max(0,n)}
 function previewBulk(){
   const mode=$('bulkMode').value,val=Number($('bulkValue').value);
-  if(!val||isNaN(val)){alert('請輸入有效嘅調整數值（百分比或金額，可用負數代表減薪）');return}
-  if(mode==='percent'&&val<=-100){alert('百分比減幅唔可以去到或超過 100%');return}
-  const targets=bulkTargets();if(!targets.length){alert('所選範圍冇在職員工');return}
+  if(!val||isNaN(val)){alert(t('msg_bulk_invalid'));return}
+  if(mode==='percent'&&val<=-100){alert(t('msg_bulk_pct'));return}
+  const targets=bulkTargets();if(!targets.length){alert(t('msg_bulk_none'));return}
   bulkPlan={scope:$('bulkScope').value,scopeLabel:$('bulkScope').selectedOptions[0].textContent,mode,value:val,items:targets.map(e=>({id:e.id,before:e.salary,after:bulkNewSalary(e.salary,mode,val)}))};
   const tb=bulkPlan.items.reduce((s,i)=>s+i.before,0),ta=bulkPlan.items.reduce((s,i)=>s+i.after,0),diff=ta-tb;
-  $('bulkPreview').innerHTML=`<div style="overflow:auto;margin-top:8px"><table><thead><tr><th>員工</th><th>現時月薪</th><th>調整後月薪</th><th>變動</th></tr></thead><tbody>${bulkPlan.items.map(i=>{const e=empById(i.id);const d=i.after-i.before;return `<tr><td>${e?personCell(e):esc(i.id)}</td><td>HK$ ${fmt(i.before)}</td><td><b>HK$ ${fmt(i.after)}</b></td><td style="color:${d>0?'var(--green)':d<0?'var(--red)':'var(--muted)'}">${d>0?'+':''}${fmt(d)}</td></tr>`}).join('')}</tbody></table></div><p style="margin-top:10px;font-size:14px">影響 <b>${bulkPlan.items.length}</b> 位員工 · 每月薪金總額 HK$ ${fmt(tb)} → HK$ ${fmt(ta)}（<b style="color:${diff>0?'var(--green)':diff<0?'var(--red)':'inherit'}">${diff>0?'+':''}${fmt(diff)} / 月</b>，全年 ${diff>0?'+':''}${fmt(diff*12)}）</p>`;
-  const b=$('bulkApplyBtn');b.disabled=false;b.style.opacity='1';toast('預覽已生成，核對後按「確認套用」');
+  $('bulkPreview').innerHTML=`<div style="overflow:auto;margin-top:8px"><table><thead><tr><th>${t('th_employee')}</th><th>${t('bulk_th_before')}</th><th>${t('bulk_th_after')}</th><th>${t('bulk_th_change')}</th></tr></thead><tbody>${bulkPlan.items.map(i=>{const e=empById(i.id);const d=i.after-i.before;return `<tr><td>${e?personCell(e):esc(i.id)}</td><td>HK$ ${fmt(i.before)}</td><td><b>HK$ ${fmt(i.after)}</b></td><td style="color:${d>0?'var(--green)':d<0?'var(--red)':'var(--muted)'}">${d>0?'+':''}${fmt(d)}</td></tr>`}).join('')}</tbody></table></div><p style="margin-top:10px;font-size:14px">${t('bulk_summary').replace('{n}',bulkPlan.items.length).replace('{b}',fmt(tb)).replace('{a}',fmt(ta)).replace('{d}',(diff>0?'+':'')+fmt(diff)).replace('{y}',(diff>0?'+':'')+fmt(diff*12))}</p>`;
+  const b=$('bulkApplyBtn');b.disabled=false;b.style.opacity='1';toast(t('msg_bulk_previewed'));
 }
 function applyBulk(){
-  if(!bulkPlan){alert('請先預覽調整');return}
+  if(!bulkPlan){alert(t('msg_bulk_need_preview'));return}
   const label=bulkPlan.mode==='percent'?((bulkPlan.value>0?'+':'')+bulkPlan.value+'%'):((bulkPlan.value>0?'+HK$ ':'-HK$ ')+fmt(Math.abs(bulkPlan.value)));
-  if(!confirm(`確定為「${bulkPlan.scopeLabel}」批量調整薪酬（${label}）？\n影響 ${bulkPlan.items.length} 位員工，每月總額 ${fmt(bulkPlan.items.reduce((s,i)=>s+i.before,0))} → ${fmt(bulkPlan.items.reduce((s,i)=>s+i.after,0))}。`))return;
+  const tb=bulkPlan.items.reduce((s,i)=>s+i.before,0),ta=bulkPlan.items.reduce((s,i)=>s+i.after,0);
+  if(!confirm(t('msg_bulk_confirm').replace('{s}',bulkPlan.scopeLabel).replace('{l}',label).replace('{n}',bulkPlan.items.length).replace('{b}',fmt(tb)).replace('{a}',fmt(ta))))return;
   const snapshot={};bulkPlan.items.forEach(i=>{snapshot[i.id]=i.before;const e=empById(i.id);if(e)e.salary=i.after});
-  DB.salaryAdjustments.push({id:'ADJ'+(DB.seq.adj++),date:new Date().toISOString().slice(0,10),time:nowTime(),scopeLabel:bulkPlan.scopeLabel,mode:bulkPlan.mode,value:bulkPlan.value,count:bulkPlan.items.length,totalBefore:bulkPlan.items.reduce((s,i)=>s+i.before,0),totalAfter:bulkPlan.items.reduce((s,i)=>s+i.after,0),snapshot,undone:false});
+  DB.salaryAdjustments.push({id:'ADJ'+(DB.seq.adj++),date:new Date().toISOString().slice(0,10),time:nowTime(),scopeLabel:bulkPlan.scopeLabel,mode:bulkPlan.mode,value:bulkPlan.value,count:bulkPlan.items.length,totalBefore:tb,totalAfter:ta,snapshot,undone:false});
   bulkPlan=null;$('bulkPreview').innerHTML='';const b=$('bulkApplyBtn');b.disabled=true;b.style.opacity='.5';$('bulkValue').value='';
-  save();renderAll();toast('批量薪酬調整已套用');
+  save();renderAll();toast(t('msg_bulk_applied'));
 }
 function undoBulk(id){
   const rec=DB.salaryAdjustments.find(a=>a.id===id);if(!rec||rec.undone)return;
-  if(!confirm('確定撤銷呢次批量調整？受影響員工嘅薪金會還原到調整前。'))return;
+  if(!confirm(t('msg_bulk_undo_confirm')))return;
   Object.entries(rec.snapshot).forEach(([empId,sal])=>{const e=empById(empId);if(e)e.salary=sal});
-  rec.undone=true;save();renderAll();toast('已撤銷該次批量調整');
+  rec.undone=true;save();renderAll();toast(t('msg_bulk_undone'));
 }
 function renderBulkHistory(){
   const el=$('bulkHistory');if(!el)return;
   const list=[...(DB.salaryAdjustments||[])].reverse();
-  el.innerHTML=list.length?`<div style="overflow:auto"><table><thead><tr><th>日期</th><th>範圍</th><th>調整</th><th>人數</th><th>每月總額變化</th><th>狀態</th><th></th></tr></thead><tbody>${list.map(a=>{const d=a.totalAfter-a.totalBefore;const label=a.mode==='percent'?((a.value>0?'+':'')+a.value+'%'):((a.value>0?'+HK$ ':'-HK$ ')+fmt(Math.abs(a.value)));return `<tr><td>${esc(a.date)} ${esc(a.time||'')}</td><td>${esc(a.scopeLabel)}</td><td>${esc(label)}</td><td>${a.count}</td><td>${fmt(a.totalBefore)} → ${fmt(a.totalAfter)}（${d>0?'+':''}${fmt(d)}）</td><td>${a.undone?'<span class="badge b-gray">已撤銷</span>':'<span class="badge b-green">已生效</span>'}</td><td>${a.undone?'':`<button class="btn small danger" onclick="undoBulk('${a.id}')">撤銷</button>`}</td></tr>`}).join('')}</tbody></table></div>`:'<div class="empty">暫時未有批量調整記錄</div>';
+  el.innerHTML=list.length?`<div style="overflow:auto"><table><thead><tr><th>${t('th_adj_date')}</th><th>${t('th_adj_scope')}</th><th>${t('th_adj_change')}</th><th>${t('th_adj_count')}</th><th>${t('th_adj_total')}</th><th>${t('th_status')}</th><th></th></tr></thead><tbody>${list.map(a=>{const d=a.totalAfter-a.totalBefore;const label=a.mode==='percent'?((a.value>0?'+':'')+a.value+'%'):((a.value>0?'+HK$ ':'-HK$ ')+fmt(Math.abs(a.value)));return `<tr><td>${esc(a.date)} ${esc(a.time||'')}</td><td>${esc(a.scopeLabel)}</td><td>${esc(label)}</td><td>${a.count}</td><td>${fmt(a.totalBefore)} → ${fmt(a.totalAfter)} (${d>0?'+':''}${fmt(d)})</td><td>${a.undone?`<span class="badge b-gray">${t('adj_undone')}</span>`:`<span class="badge b-green">${t('adj_effective')}</span>`}</td><td>${a.undone?'':`<button class="btn small danger" onclick="undoBulk('${a.id}')">${t('undo')}</button>`}</td></tr>`}).join('')}</tbody></table></div>`:`<div class="empty">${t('bulk_none')}</div>`;
 }
 
+/* ============ Common ============ */
 function closeModal(id){$(id).classList.remove('open')}
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
-$('resetData').addEventListener('click',e=>{e.preventDefault();if(confirm('確定重設為示範資料？你新增/修改嘅資料會被清除。')){localStorage.removeItem(KEY);DB=load();renderAll();toast('已重設示範資料')}});
 function renderAll(){fillDeptSelects();renderDashboard();renderEmployees();renderDepts();renderAtt();renderLeaves();renderPayroll()}
-renderAll();
+
+/* ============ Init (IndexedDB, with localStorage migration) ============ */
+(async function init(){
+  let migrated=false;
+  try{
+    const ui=await idbGet('ui');if(ui){THEME=ui.theme||'light';LANG=ui.lang||'zh'}
+    let state=await idbGet('state');
+    if(!state){
+      const legacy=localStorage.getItem('hrms_v1');
+      if(legacy){try{state=normalize(JSON.parse(legacy));migrated=true}catch(e){state=null}}
+    }
+    if(!state)state=seed();
+    DB=normalize(state);
+    await idbSet('state',DB);
+    if(migrated)localStorage.removeItem('hrms_v1');
+  }catch(e){console.error('IDB init failed, falling back to seed',e);DB=seed()}
+  applyI18n();
+  $('loadingMsg').style.display='none';
+  $('page-dashboard').style.display='';
+  renderAll();
+  if(migrated)toast(t('msg_migrated'));
+  $('resetData').addEventListener('click',async e=>{e.preventDefault();if(confirm(t('msg_reset_confirm'))){DB=seed();await idbSet('state',DB);try{localStorage.removeItem('hrms_v1')}catch(_){}renderAll();toast(t('msg_reset_done'))}});
+})();
 </script>
 </body>
 </html>
