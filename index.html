@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HRMS 人力資源管理系統</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#2563eb;--blue2:#1e40af;--teal:#0ea5a4;--bg:#f1f5f9;--card:#fff;--text:#0f172a;--muted:#64748b;--line:#e2e8f0;--green:#16a34a;--amber:#d97706;--red:#dc2626;--radius:14px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang HK","Microsoft JhengHei",sans-serif;background:var(--bg);color:var(--text)}
+a{color:var(--blue);text-decoration:none}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:232px;background:#0f2447;color:#dbeafe;display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;z-index:20}
+.logo{padding:20px 18px 14px;border-bottom:1px solid rgba(255,255,255,.12)}
+.logo h1{font-size:20px;color:#fff;letter-spacing:.5px}
+.logo p{font-size:12px;opacity:.75;margin-top:4px;line-height:1.5}
+.nav{padding:12px 10px;display:flex;flex-direction:column;gap:4px}
+.nav button{background:none;border:0;color:#dbeafe;text-align:left;padding:11px 12px;border-radius:10px;font-size:15px;cursor:pointer;display:flex;gap:10px;align-items:center}
+.nav button:hover{background:rgba(255,255,255,.08)}
+.nav button.active{background:var(--blue);color:#fff}
+.sidefoot{margin-top:auto;padding:14px 18px;font-size:12px;opacity:.7;line-height:1.6;border-top:1px solid rgba(255,255,255,.12)}
+.main{flex:1;margin-left:232px;padding:22px 26px 40px;min-width:0}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.topbar h2{font-size:24px}
+.topbar .sub{color:var(--muted);font-size:13px;margin-top:3px}
+.btn{background:var(--blue);color:#fff;border:0;padding:9px 16px;border-radius:9px;font-size:14px;cursor:pointer}
+.btn:hover{background:var(--blue2)}
+.btn.ghost{background:#fff;color:var(--text);border:1px solid var(--line)}
+.btn.small{padding:6px 11px;font-size:13px}
+.btn.danger{background:#fff;color:var(--red);border:1px solid #fecaca}
+.btn.green{background:var(--green)} .btn.amber{background:var(--amber)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.card .k{font-size:13px;color:var(--muted)} .card .v{font-size:30px;font-weight:700;margin:6px 0 2px} .card .d{font-size:12px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}.sidebar{position:static;width:100%}.layout{flex-direction:column}.main{margin-left:0;padding:16px}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.panel h3{font-size:16px;margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{color:var(--muted);font-size:12px;letter-spacing:.4px}
+tr:hover td{background:#f8fafc}
+.badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.b-green{background:#dcfce7;color:#166534}.b-amber{background:#fef3c7;color:#92400e}.b-red{background:#fee2e2;color:#991b1b}.b-blue{background:#dbeafe;color:#1e40af}.b-gray{background:#e2e8f0;color:#475569}
+.avatar{width:36px;height:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex:none}
+.person{display:flex;gap:10px;align-items:center}
+.person small{display:block;color:var(--muted);font-size:12px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.toolbar input,.toolbar select,.field input,.field select,.field textarea{padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:14px;background:#fff;font-family:inherit}
+.toolbar input{flex:1;min-width:180px}
+.page{display:none}.page.active{display:block}
+.bar-row{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:13px}
+.bar-row .name{width:110px;flex:none}.bar-track{flex:1;background:#e2e8f0;border-radius:99px;height:12px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--teal));border-radius:99px}
+.bar-row .num{width:52px;text-align:right;color:var(--muted)}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:flex-start;justify-content:center;padding:28px 14px;z-index:50;overflow:auto}
+.modal.open{display:flex}
+.sheet{background:#fff;border-radius:16px;width:640px;max-width:100%;padding:22px}
+.sheet h3{font-size:18px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--muted)}
+.field.full{grid-column:1/-1}
+.field input,.field select,.field textarea{color:var(--text);width:100%}
+.sheet .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:11px 18px;border-radius:10px;font-size:14px;display:none;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.empty{padding:26px;text-align:center;color:var(--muted)}
+.note{font-size:12px;color:var(--muted);line-height:1.7}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:8px 14px;font-size:14px}
+.kv dt{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="logo"><h1>🏢 HRMS</h1><p>人力資源管理系統<br>Human Resource Management System</p></div>
+    <nav class="nav" id="nav">
+      <button data-page="dashboard" class="active">📊 儀表板</button>
+      <button data-page="employees">👥 員工管理</button>
+      <button data-page="departments">🏬 部門管理</button>
+      <button data-page="attendance">🕐 考勤管理</button>
+      <button data-page="leaves">🌴 請假管理</button>
+      <button data-page="payroll">💰 薪酬管理</button>
+    </nav>
+    <div class="sidefoot">示範版 · 資料儲存在本機瀏覽器<br>（localStorage）<br><a href="#" id="resetData" style="color:#93c5fd">重設示範資料</a></div>
+  </aside>
+
+  <main class="main">
+    <!-- Dashboard -->
+    <section class="page active" id="page-dashboard">
+      <div class="topbar"><div><h2>儀表板</h2><div class="sub" id="todayLine"></div></div><button class="btn" onclick="openEmpModal()">＋ 新增員工</button></div>
+      <div class="cards" id="statCards"></div>
+      <div class="grid2">
+        <div class="panel"><h3>各部門人數</h3><div id="deptBars"></div></div>
+        <div class="panel"><h3>待批核請假</h3><div id="pendingLeaves"></div></div>
+      </div>
+      <div class="panel"><h3>最近入職員工</h3><div id="recentEmp"></div></div>
+    </section>
+
+    <!-- Employees -->
+    <section class="page" id="page-employees">
+      <div class="topbar"><div><h2>員工管理</h2><div class="sub">搜尋、新增、編輯及匯出員工資料</div></div><div><button class="btn ghost" onclick="exportCSV()">⬇ 匯出 CSV</button> <button class="btn" onclick="openEmpModal()">＋ 新增員工</button></div></div>
+      <div class="panel">
+        <div class="toolbar">
+          <input id="empSearch" placeholder="搜尋姓名 / 編號 / 職位…" oninput="renderEmployees()">
+          <select id="empDeptFilter" onchange="renderEmployees()"></select>
+          <select id="empStatusFilter" onchange="renderEmployees()"><option value="">全部狀態</option><option>在職</option><option>請假中</option><option>已離職</option></select>
+        </div>
+        <div style="overflow:auto"><table><thead><tr><th>員工</th><th>部門</th><th>職位</th><th>入職日期</th><th>月薪 (HK$)</th><th>狀態</th><th></th></tr></thead><tbody id="empTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- Departments -->
+    <section class="page" id="page-departments">
+      <div class="topbar"><div><h2>部門管理</h2><div class="sub">部門架構與人手概覽</div></div><button class="btn" onclick="openDeptModal()">＋ 新增部門</button></div>
+      <div class="cards" id="deptCards"></div>
+    </section>
+
+    <!-- Attendance -->
+    <section class="page" id="page-attendance">
+      <div class="topbar"><div><h2>考勤管理</h2><div class="sub">今日打卡記錄（可即場模擬打卡）</div></div></div>
+      <div class="panel">
+        <div class="toolbar"><select id="attEmp"></select><button class="btn green" onclick="clockIn()">上班打卡</button><button class="btn amber" onclick="clockOut()">下班打卡</button><span class="note">標準上班時間 09:00，遲於 09:00 會標示為遲到。</span></div>
+        <div style="overflow:auto"><table><thead><tr><th>員工</th><th>日期</th><th>上班</th><th>下班</th><th>狀態</th></tr></thead><tbody id="attTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- Leaves -->
+    <section class="page" id="page-leaves">
+      <div class="topbar"><div><h2>請假管理</h2><div class="sub">請假申請、批核及假期餘額</div></div><button class="btn" onclick="openLeaveModal()">＋ 新增申請</button></div>
+      <div class="panel"><div style="overflow:auto"><table><thead><tr><th>員工</th><th>類型</th><th>日期</th><th>日數</th><th>原因</th><th>狀態</th><th></th></tr></thead><tbody id="leaveTable"></tbody></table></div></div>
+      <div class="panel"><h3>假期餘額（在職員工）</h3><div id="leaveBalance"></div></div>
+    </section>
+
+    <!-- Payroll -->
+    <section class="page" id="page-payroll">
+      <div class="topbar"><div><h2>薪酬管理</h2><div class="sub">本月薪金與強積金（MPF）計算</div></div><button class="btn ghost" onclick="exportPayroll()">⬇ 匯出薪酬 CSV</button></div>
+      <div class="cards" id="payCards"></div>
+      <div class="panel"><div style="overflow:auto"><table><thead><tr><th>員工</th><th>基本月薪</th><th>僱員 MPF (5%)</th><th>僱主 MPF (5%)</th><th>實發薪金</th></tr></thead><tbody id="payTable"></tbody></table></div>
+      <p class="note">MPF 計算跟香港現行規則示範：僱主及僱員各供款入息 5%，每月供款上限各 HK$1,500（有關入息上限 HK$30,000）；月入低於 HK$7,100 僱員免供款、僱主仍須供款。此頁僅作系統示範，不構成薪酬或法例意見。</p></div>
+    </section>
+  </main>
+</div>
+
+<!-- Employee modal -->
+<div class="modal" id="empModal"><div class="sheet"><h3><span id="empModalTitle">新增員工</span><button class="btn ghost small" onclick="closeModal('empModal')">✕</button></h3>
+<form id="empForm" onsubmit="saveEmployee(event)"><div class="form">
+<div class="field"><label>中文姓名 *</label><input name="name" required></div>
+<div class="field"><label>英文姓名</label><input name="enName"></div>
+<div class="field"><label>電郵 *</label><input name="email" type="email" required></div>
+<div class="field"><label>電話</label><input name="phone"></div>
+<div class="field"><label>部門 *</label><select name="deptId" id="empFormDept" required></select></div>
+<div class="field"><label>職位 *</label><input name="position" required></div>
+<div class="field"><label>入職日期 *</label><input name="joinDate" type="date" required></div>
+<div class="field"><label>月薪 (HK$) *</label><input name="salary" type="number" min="0" step="100" required></div>
+<div class="field"><label>狀態</label><select name="status"><option>在職</option><option>請假中</option><option>已離職</option></select></div>
+<div class="field"><label>年假餘額（日）</label><input name="alBal" type="number" min="0" value="14"></div>
+</div><div class="actions"><button type="button" class="btn ghost" onclick="closeModal('empModal')">取消</button><button class="btn" type="submit">儲存</button></div></form></div></div>
+
+<!-- Department modal -->
+<div class="modal" id="deptModal"><div class="sheet"><h3><span id="deptModalTitle">新增部門</span><button class="btn ghost small" onclick="closeModal('deptModal')">✕</button></h3>
+<form id="deptForm" onsubmit="saveDept(event)"><div class="form">
+<div class="field full"><label>部門名稱 *</label><input name="name" required></div>
+<div class="field full"><label>部門主管</label><select name="managerId" id="deptMgr"></select></div>
+<div class="field full"><label>描述</label><textarea name="desc" rows="2"></textarea></div>
+</div><div class="actions"><button type="button" class="btn ghost" onclick="closeModal('deptModal')">取消</button><button class="btn" type="submit">儲存</button></div></form></div></div>
+
+<!-- Leave modal -->
+<div class="modal" id="leaveModal"><div class="sheet"><h3>新增請假申請<button class="btn ghost small" onclick="closeModal('leaveModal')">✕</button></h3>
+<form onsubmit="saveLeave(event)"><div class="form">
+<div class="field"><label>員工 *</label><select name="empId" id="leaveEmp" required></select></div>
+<div class="field"><label>假期類型 *</label><select name="type"><option>年假</option><option>病假</option><option>事假</option><option>婚假</option><option>產假</option><option>陪產假</option></select></div>
+<div class="field"><label>開始日期 *</label><input name="start" type="date" required></div>
+<div class="field"><label>結束日期 *</label><input name="end" type="date" required></div>
+<div class="field full"><label>原因</label><textarea name="reason" rows="2"></textarea></div>
+</div><div class="actions"><button type="button" class="btn ghost" onclick="closeModal('leaveModal')">取消</button><button class="btn" type="submit">提交申請</button></div></form></div></div>
+
+<!-- Detail modal -->
+<div class="modal" id="detailModal"><div class="sheet"><h3>員工詳情<button class="btn ghost small" onclick="closeModal('detailModal')">✕</button></h3><div id="detailBody"></div></div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY='hrms_v1';
+const COLORS=['#2563eb','#0ea5a4','#7c3aed','#db2777','#ea580c','#16a34a','#0891b2','#ca8a04'];
+function seed(){
+  const depts=[
+    {id:'D1',name:'金融科技部',desc:'資訊科技基礎設施及系統開發',managerId:'E001'},
+    {id:'D2',name:'人力資源部',desc:'招聘、培訓、薪酬福利',managerId:'E005'},
+    {id:'D3',name:'財務部',desc:'會計、預算及財務報告',managerId:'E007'},
+    {id:'D4',name:'營運部',desc:'日常營運及流程管理',managerId:'E009'},
+    {id:'D5',name:'市場部',desc:'品牌、推廣及客戶關係',managerId:'E011'}];
+  const emps=[
+    ['E001','陳大文','Chan Tai Man','D1','資訊科技總監',98000,'2018-03-01','在職',18],
+    ['E002','李小玲','Lee Siu Ling','D1','高級系統工程師',52000,'2020-07-15','在職',12],
+    ['E003','黃志強','Wong Chi Keung','D1','網絡工程師',38000,'2022-01-10','在職',10],
+    ['E004','張美儀','Cheung Mei Yee','D1','助理工程師',24000,'2024-09-02','在職',14],
+    ['E005','林嘉欣','Lam Ka Yan','D2','人力資源經理',55000,'2019-05-20','在職',15],
+    ['E006','吳俊傑','Ng Chun Kit','D2','人力資源主任',28000,'2023-04-03','請假中',8],
+    ['E007','劉慧敏','Lau Wai Man','D3','財務總監',88000,'2017-11-01','在職',20],
+    ['E008','何家豪','Ho Ka Ho','D3','會計主任',30000,'2021-08-16','在職',11],
+    ['E009','梁詠詩','Leung Wing Sze','D4','營運經理',58000,'2019-02-11','在職',16],
+    ['E010','鄭子健','Cheng Tsz Kin','D4','營運助理',21000,'2025-01-06','在職',14],
+    ['E011','楊芷晴','Yeung Tsz Ching','D5','市場經理',50000,'2020-10-05','在職',13],
+    ['E012','蔡文軒','Choi Man Hin','D5','市場主任',26000,'2023-11-20','在職',9]
+  ].map((r,i)=>({id:r[0],name:r[1],enName:r[2],deptId:r[3],position:r[4],salary:r[5],joinDate:r[6],status:r[7],alBal:r[8],sickBal:10,email:r[2].toLowerCase().replace(/[^a-z ]/g,'').trim().replace(/\s+/g,'.')+'@company.hk',phone:'9'+String(1234567+i*137).slice(0,7),color:COLORS[i%COLORS.length]}));
+  const today=new Date().toISOString().slice(0,10);
+  const att=emps.slice(0,9).map((e,i)=>({id:'A'+i,empId:e.id,date:today,in:i<7?'08:'+(52+i):'09:'+(12+i),out:'',status:i<7?'準時':'遲到'}));
+  const leaves=[
+    {id:'L1',empId:'E006',type:'年假',start:today,end:today,days:1,reason:'家庭事務',status:'待批核',applied:today},
+    {id:'L2',empId:'E003',type:'病假',start:today,end:today,days:1,reason:'感冒求診',status:'已批核',applied:today},
+    {id:'L3',empId:'E011',type:'年假',start:'2026-12-24',end:'2026-12-31',days:6,reason:'聖誕外遊',status:'待批核',applied:today}];
+  return {depts,emps,att,leaves,seq:{emp:13,dept:6,leave:4,att:100}};
+}
+let DB=load();
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.emps)return d}catch(e){} const s=seed();localStorage.setItem(KEY,JSON.stringify(s));return s}
+function save(){localStorage.setItem(KEY,JSON.stringify(DB))}
+function $(id){return document.getElementById(id)}
+function fmt(n){return Number(n).toLocaleString('en-HK')}
+function deptName(id){const d=DB.depts.find(x=>x.id===id);return d?d.name:'—'}
+function empById(id){return DB.emps.find(x=>x.id===id)}
+function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function toast(msg){const t=$('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2400)}
+function badge(st){const m={'在職':'b-green','請假中':'b-amber','已離職':'b-gray','已批核':'b-green','待批核':'b-amber','已拒絕':'b-red','準時':'b-green','遲到':'b-amber','缺勤':'b-red'};return `<span class="badge ${m[st]||'b-blue'}">${esc(st)}</span>`}
+function personCell(e){return `<div class="person"><span class="avatar" style="background:${e.color}">${esc(e.name[0]||'?')}</span><span>${esc(e.name)}<small>${esc(e.id)} · ${esc(e.enName||'')}</small></span></div>`}
+
+/* Navigation */
+$('nav').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+b.dataset.page));renderAll()});
+function goto(page){document.querySelector(`.nav button[data-page="${page}"]`).click()}
+
+/* Dashboard */
+function renderDashboard(){
+  $('todayLine').textContent='今日係 '+new Date().toLocaleDateString('zh-HK',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+  const active=DB.emps.filter(e=>e.status!=='已離職');
+  const onLeave=DB.emps.filter(e=>e.status==='請假中').length;
+  const pending=DB.leaves.filter(l=>l.status==='待批核').length;
+  const today=new Date().toISOString().slice(0,10);
+  const attToday=DB.att.filter(a=>a.date===today);
+  const rate=active.length?Math.round(attToday.filter(a=>a.in).length/active.length*100):0;
+  const avg=active.length?Math.round(active.reduce((s,e)=>s+e.salary,0)/active.length):0;
+  $('statCards').innerHTML=[
+    ['👥 在職員工',active.length,'共 '+DB.emps.length+' 位員工記錄'],
+    ['🏬 部門數目',DB.depts.length,'涵蓋全公司架構'],
+    ['🌴 請假中',onLeave,'另有 '+pending+' 宗待批核申請'],
+    ['🕐 今日出勤率',rate+'%','今日已打卡 '+attToday.length+' 人'],
+    ['💰 平均月薪','HK$'+fmt(avg),'在職員工平均值']
+  ].map(c=>`<div class="card"><div class="k">${c[0]}</div><div class="v">${c[1]}</div><div class="d">${c[2]}</div></div>`).join('');
+  const max=Math.max(1,...DB.depts.map(d=>DB.emps.filter(e=>e.deptId===d.id&&e.status!=='已離職').length));
+  $('deptBars').innerHTML=DB.depts.map(d=>{const n=DB.emps.filter(e=>e.deptId===d.id&&e.status!=='已離職').length;return `<div class="bar-row"><span class="name">${esc(d.name)}</span><span class="bar-track"><span class="bar-fill" style="width:${n/max*100}%"></span></span><span class="num">${n} 人</span></div>`}).join('')||'<div class="empty">未有部門</div>';
+  const pend=DB.leaves.filter(l=>l.status==='待批核');
+  $('pendingLeaves').innerHTML=pend.length?pend.map(l=>{const e=empById(l.empId);return `<div class="bar-row"><span style="flex:1">${esc(e?e.name:'?')} · ${esc(l.type)} ${esc(l.start)} 起 ${l.days} 日</span><button class="btn small green" onclick="decideLeave('${l.id}',true)">批核</button> <button class="btn small danger" onclick="decideLeave('${l.id}',false)">拒絕</button></div>`}).join(''):'<div class="empty">🎉 暫時冇待批核申請</div>';
+  const recent=[...DB.emps].sort((a,b)=>b.joinDate.localeCompare(a.joinDate)).slice(0,5);
+  $('recentEmp').innerHTML=`<table><tbody>${recent.map(e=>`<tr><td>${personCell(e)}</td><td>${esc(deptName(e.deptId))}</td><td>${esc(e.position)}</td><td>${esc(e.joinDate)}</td></tr>`).join('')}</tbody></table>`;
+}
+
+/* Employees */
+function fillDeptSelects(){
+  const opts='<option value="">全部部門</option>'+DB.depts.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
+  $('empDeptFilter').innerHTML=opts;
+  $('empFormDept').innerHTML=DB.depts.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
+  $('deptMgr').innerHTML='<option value="">（未指定）</option>'+DB.emps.filter(e=>e.status!=='已離職').map(e=>`<option value="${e.id}">${esc(e.name)}（${esc(deptName(e.deptId))}）</option>`).join('');
+  $('attEmp').innerHTML=DB.emps.filter(e=>e.status!=='已離職').map(e=>`<option value="${e.id}">${esc(e.name)}（${esc(deptName(e.deptId))}）</option>`).join('');
+  $('leaveEmp').innerHTML=DB.emps.filter(e=>e.status!=='已離職').map(e=>`<option value="${e.id}">${esc(e.name)}（年假餘 ${e.alBal} 日）</option>`).join('');
+}
+function renderEmployees(){
+  const q=($('empSearch').value||'').toLowerCase(),df=$('empDeptFilter').value,sf=$('empStatusFilter').value;
+  const list=DB.emps.filter(e=>(!q||(e.name+e.id+e.position+(e.enName||'')).toLowerCase().includes(q))&&(!df||e.deptId===df)&&(!sf||e.status===sf));
+  $('empTable').innerHTML=list.length?list.map(e=>`<tr><td>${personCell(e)}</td><td>${esc(deptName(e.deptId))}</td><td>${esc(e.position)}</td><td>${esc(e.joinDate)}</td><td>${fmt(e.salary)}</td><td>${badge(e.status)}</td><td style="white-space:nowrap"><button class="btn small ghost" onclick="viewEmp('${e.id}')">詳情</button> <button class="btn small ghost" onclick="openEmpModal('${e.id}')">編輯</button> <button class="btn small danger" onclick="delEmp('${e.id}')">刪除</button></td></tr>`).join(''):'<tr><td colspan="7"><div class="empty">搵唔到符合條件嘅員工</div></td></tr>';
+}
+let editingEmp=null;
+function openEmpModal(id){editingEmp=id||null;const f=$('empForm');f.reset();$('empModalTitle').textContent=id?'編輯員工':'新增員工';if(id){const e=empById(id);f.name.value=e.name;f.enName.value=e.enName||'';f.email.value=e.email;f.phone.value=e.phone||'';f.deptId.value=e.deptId;f.position.value=e.position;f.joinDate.value=e.joinDate;f.salary.value=e.salary;f.status.value=e.status;f.alBal.value=e.alBal}$('empModal').classList.add('open')}
+function saveEmployee(ev){ev.preventDefault();const f=new FormData(ev.target);const data={name:f.get('name'),enName:f.get('enName'),email:f.get('email'),phone:f.get('phone'),deptId:f.get('deptId'),position:f.get('position'),joinDate:f.get('joinDate'),salary:Number(f.get('salary')),status:f.get('status'),alBal:Number(f.get('alBal'))};
+  if(editingEmp){Object.assign(empById(editingEmp),data);toast('員工資料已更新')}else{DB.emps.push({id:'E'+String(DB.seq.emp++).padStart(3,'0'),sickBal:10,color:COLORS[DB.emps.length%COLORS.length],...data});toast('員工已新增')}
+  save();closeModal('empModal');renderAll()}
+function delEmp(id){const e=empById(id);if(!confirm('確定刪除員工「'+e.name+'」？此動作不能復原。'))return;DB.emps=DB.emps.filter(x=>x.id!==id);save();renderAll();toast('已刪除 '+e.name)}
+function viewEmp(id){const e=empById(id);$('detailBody').innerHTML=`<dl class="kv"><dt>員工編號</dt><dd>${esc(e.id)}</dd><dt>姓名</dt><dd>${esc(e.name)}（${esc(e.enName||'')}）</dd><dt>電郵</dt><dd>${esc(e.email)}</dd><dt>電話</dt><dd>${esc(e.phone||'—')}</dd><dt>部門 / 職位</dt><dd>${esc(deptName(e.deptId))} / ${esc(e.position)}</dd><dt>入職日期</dt><dd>${esc(e.joinDate)}</dd><dt>月薪</dt><dd>HK$ ${fmt(e.salary)}</dd><dt>狀態</dt><dd>${badge(e.status)}</dd><dt>假期餘額</dt><dd>年假 ${e.alBal} 日 · 病假 ${e.sickBal} 日</dd></dl>`;$('detailModal').classList.add('open')}
+function exportCSV(){const rows=[['編號','姓名','英文名','電郵','電話','部門','職位','入職日期','月薪','狀態'],...DB.emps.map(e=>[e.id,e.name,e.enName,e.email,e.phone,deptName(e.deptId),e.position,e.joinDate,e.salary,e.status])];downloadCSV(rows,'employees.csv');toast('員工 CSV 已匯出')}
+function exportPayroll(){const rows=[['編號','姓名','部門','基本月薪','僱員MPF','僱主MPF','實發薪金'],...payrollRows().map(r=>[r.e.id,r.e.name,deptName(r.e.deptId),r.base,r.empMpf,r.erMpf,r.net])];downloadCSV(rows,'payroll.csv');toast('薪酬 CSV 已匯出')}
+function downloadCSV(rows,name){const csv=rows.map(r=>r.map(c=>'"'+String(c??'').replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download=name;a.click()}
+
+/* Departments */
+function renderDepts(){
+  $('deptCards').innerHTML=DB.depts.map(d=>{const members=DB.emps.filter(e=>e.deptId===d.id&&e.status!=='已離職');const mgr=empById(d.managerId);const total=members.reduce((s,e)=>s+e.salary,0);return `<div class="card"><div class="k">🏬 部門</div><div style="font-size:19px;font-weight:700;margin:6px 0">${esc(d.name)}</div><div class="d" style="line-height:1.8">主管：${mgr?esc(mgr.name):'未指定'}<br>人數：${members.length} 人<br>每月薪金支出：HK$ ${fmt(total)}<br>${esc(d.desc||'')}</div><div style="margin-top:10px"><button class="btn small ghost" onclick="openDeptModal('${d.id}')">編輯</button> <button class="btn small danger" onclick="delDept('${d.id}')">刪除</button></div></div>`}).join('')||'<div class="empty">未有部門</div>';
+}
+let editingDept=null;
+function openDeptModal(id){editingDept=id||null;const f=$('deptForm');f.reset();$('deptModalTitle').textContent=id?'編輯部門':'新增部門';fillDeptSelects();if(id){const d=DB.depts.find(x=>x.id===id);f.name.value=d.name;f.managerId.value=d.managerId||'';f.desc.value=d.desc||''}$('deptModal').classList.add('open')}
+function saveDept(ev){ev.preventDefault();const f=new FormData(ev.target);const data={name:f.get('name'),managerId:f.get('managerId'),desc:f.get('desc')};if(editingDept){Object.assign(DB.depts.find(x=>x.id===editingDept),data);toast('部門已更新')}else{DB.depts.push({id:'D'+(DB.seq.dept++),...data});toast('部門已新增')}save();closeModal('deptModal');renderAll()}
+function delDept(id){if(DB.emps.some(e=>e.deptId===id)){alert('呢個部門仲有員工，未能刪除。請先將員工轉去其他部門。');return}if(!confirm('確定刪除呢個部門？'))return;DB.depts=DB.depts.filter(x=>x.id!==id);save();renderAll();toast('部門已刪除')}
+
+/* Attendance */
+function renderAtt(){
+  const list=[...DB.att].sort((a,b)=>b.date.localeCompare(a.date)||a.empId.localeCompare(b.empId)).slice(0,60);
+  $('attTable').innerHTML=list.length?list.map(a=>{const e=empById(a.empId);return `<tr><td>${e?personCell(e):esc(a.empId)}</td><td>${esc(a.date)}</td><td>${esc(a.in||'—')}</td><td>${esc(a.out||'—')}</td><td>${badge(a.status)}</td></tr>`}).join(''):'<tr><td colspan="5"><div class="empty">未有考勤記錄</div></td></tr>';
+}
+function nowTime(){const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+function clockIn(){const id=$('attEmp').value;const today=new Date().toISOString().slice(0,10);if(DB.att.some(a=>a.empId===id&&a.date===today&&a.in)){toast('今日已經打咗上班卡');return}const t=nowTime();DB.att.push({id:'A'+(DB.seq.att++),empId:id,date:today,in:t,out:'',status:t<='09:00'?'準時':'遲到'});save();renderAll();toast('上班打卡 '+t)}
+function clockOut(){const id=$('attEmp').value;const today=new Date().toISOString().slice(0,10);const rec=DB.att.find(a=>a.empId===id&&a.date===today&&a.in&&!a.out);if(!rec){toast('今日未有上班記錄，或已經打咗下班卡');return}rec.out=nowTime();save();renderAll();toast('下班打卡 '+rec.out)}
+
+/* Leaves */
+function renderLeaves(){
+  $('leaveTable').innerHTML=DB.leaves.length?[...DB.leaves].reverse().map(l=>{const e=empById(l.empId);return `<tr><td>${e?personCell(e):esc(l.empId)}</td><td>${esc(l.type)}</td><td>${esc(l.start)} 至 ${esc(l.end)}</td><td>${l.days}</td><td>${esc(l.reason||'—')}</td><td>${badge(l.status)}</td><td style="white-space:nowrap">${l.status==='待批核'?`<button class="btn small green" onclick="decideLeave('${l.id}',true)">批核</button> <button class="btn small danger" onclick="decideLeave('${l.id}',false)">拒絕</button>`:''}</td></tr>`}).join(''):'<tr><td colspan="7"><div class="empty">未有請假申請</div></td></tr>';
+  $('leaveBalance').innerHTML=`<table><thead><tr><th>員工</th><th>年假餘額</th><th>病假餘額</th></tr></thead><tbody>${DB.emps.filter(e=>e.status!=='已離職').map(e=>`<tr><td>${personCell(e)}</td><td>${e.alBal} 日</td><td>${e.sickBal} 日</td></tr>`).join('')}</tbody></table>`;
+}
+function openLeaveModal(){$('leaveModal').classList.add('open')}
+function saveLeave(ev){ev.preventDefault();const f=new FormData(ev.target);const start=f.get('start'),end=f.get('end');if(end<start){alert('結束日期不能早於開始日期');return}const days=Math.round((new Date(end)-new Date(start))/86400000)+1;DB.leaves.push({id:'L'+(DB.seq.leave++),empId:f.get('empId'),type:f.get('type'),start,end,days,reason:f.get('reason'),status:'待批核',applied:new Date().toISOString().slice(0,10)});save();closeModal('leaveModal');renderAll();toast('請假申請已提交，等待批核')}
+function decideLeave(id,ok){const l=DB.leaves.find(x=>x.id===id);if(!l||l.status!=='待批核')return;l.status=ok?'已批核':'已拒絕';if(ok){const e=empById(l.empId);if(e){if(l.type==='年假')e.alBal=Math.max(0,e.alBal-l.days);if(l.type==='病假')e.sickBal=Math.max(0,e.sickBal-l.days)}}save();renderAll();toast(ok?'申請已批核':'申請已拒絕')}
+
+/* Payroll */
+function mpf(salary,isEmployee){if(salary<7100)return isEmployee?0:Math.round(salary*0.05);return Math.min(1500,Math.round(salary*0.05))}
+function payrollRows(){return DB.emps.filter(e=>e.status!=='已離職').map(e=>{const empMpf=mpf(e.salary,true),erMpf=mpf(e.salary,false);return{e,base:e.salary,empMpf,erMpf,net:e.salary-empMpf}})}
+function renderPayroll(){
+  const rows=payrollRows();const total=rows.reduce((s,r)=>s+r.base,0),er=rows.reduce((s,r)=>s+r.erMpf,0),net=rows.reduce((s,r)=>s+r.net,0);
+  $('payCards').innerHTML=[['💵 本月薪金總額','HK$'+fmt(total)],['🏢 僱主 MPF 總供款','HK$'+fmt(er)],['👛 員工實發總額','HK$'+fmt(net)],['👥 出糧人數',rows.length+' 人']].map(c=>`<div class="card"><div class="k">${c[0]}</div><div class="v" style="font-size:23px">${c[1]}</div></div>`).join('');
+  $('payTable').innerHTML=rows.map(r=>`<tr><td>${personCell(r.e)}</td><td>HK$ ${fmt(r.base)}</td><td>HK$ ${fmt(r.empMpf)}</td><td>HK$ ${fmt(r.erMpf)}</td><td><b>HK$ ${fmt(r.net)}</b></td></tr>`).join('');
+}
+
+function closeModal(id){$(id).classList.remove('open')}
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+$('resetData').addEventListener('click',e=>{e.preventDefault();if(confirm('確定重設為示範資料？你新增/修改嘅資料會被清除。')){localStorage.removeItem(KEY);DB=load();renderAll();toast('已重設示範資料')}});
+function renderAll(){fillDeptSelects();renderDashboard();renderEmployees();renderDepts();renderAtt();renderLeaves();renderPayroll()}
+renderAll();
+</script>
+</body>
+</html>
