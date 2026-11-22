@@ -89,6 +89,7 @@ html[data-theme="dark"] .toast{background:#e2e8f0;color:#0f172a}
       <button data-page="attendance">🕐 <span data-i18n="nav_attendance">考勤管理</span></button>
       <button data-page="leaves">🌴 <span data-i18n="nav_leaves">請假管理</span></button>
       <button data-page="payroll">💰 <span data-i18n="nav_payroll">薪酬管理</span></button>
+      <button data-page="recruitment">🧲 <span data-i18n="nav_recruitment">招聘管理</span></button>
     </nav>
     <div class="sidefoot">
       <div class="uibtns">
@@ -167,6 +168,23 @@ html[data-theme="dark"] .toast{background:#e2e8f0;color:#0f172a}
       <div class="panel"><div style="overflow:auto"><table><thead><tr><th data-i18n="th_employee">員工</th><th data-i18n="th_base">基本月薪</th><th data-i18n="th_emp_mpf">僱員 MPF (5%)</th><th data-i18n="th_er_mpf">僱主 MPF (5%)</th><th data-i18n="th_net">實發薪金</th></tr></thead><tbody id="payTable"></tbody></table></div>
       <p class="note" data-i18n="mpf_note">MPF 計算跟香港現行規則示範：僱主及僱員各供款入息 5%，每月供款上限各 HK$1,500（有關入息上限 HK$30,000）；月入低於 HK$7,100 僱員免供款、僱主仍須供款。此頁僅作系統示範，不構成薪酬或法例意見。</p></div>
     </section>
+
+    <!-- Recruitment -->
+    <section class="page" id="page-recruitment">
+      <div class="topbar"><div><h2 data-i18n="nav_recruitment">招聘管理</h2><div class="sub" data-i18n="rec_sub">職位空缺、應徵者及面試階段一覽</div></div><button class="btn" onclick="openJobModal()">＋ <span data-i18n="add_job">新增職位</span></button></div>
+      <div class="cards" id="recCards"></div>
+      <div class="panel"><h3 data-i18n="rec_jobs_title">職位空缺</h3>
+        <div style="overflow:auto"><table><thead><tr><th data-i18n="th_job">職位</th><th data-i18n="th_dept">部門</th><th data-i18n="th_job_type">形式</th><th data-i18n="th_vacancies">空缺數</th><th data-i18n="th_salary_range">薪酬範圍 (HK$)</th><th data-i18n="th_posted">刊登日期</th><th data-i18n="th_status">狀態</th><th data-i18n="th_applicants">應徵者</th><th></th></tr></thead><tbody id="recJobsTable"></tbody></table></div>
+      </div>
+      <div class="panel" id="recAppPanel"><h3 data-i18n="rec_apps_title">應徵者</h3>
+        <div class="toolbar">
+          <select id="recJobFilter" onchange="renderRecruitment()" style="min-width:200px"></select>
+          <select id="recStageFilter" onchange="renderApplicants()"></select>
+          <button class="btn" onclick="openAppModal()">＋ <span data-i18n="add_applicant">新增應徵者</span></button>
+        </div>
+        <div style="overflow:auto"><table><thead><tr><th data-i18n="th_employee">應徵者</th><th data-i18n="th_contact">聯絡</th><th data-i18n="th_job">職位</th><th data-i18n="th_applied">申請日期</th><th data-i18n="th_source">來源</th><th data-i18n="th_stage">階段</th><th data-i18n="th_notes">備註</th><th></th></tr></thead><tbody id="recAppTable"></tbody></table></div>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -203,6 +221,32 @@ html[data-theme="dark"] .toast{background:#e2e8f0;color:#0f172a}
 <div class="field full"><label data-i18n="th_reason">原因</label><textarea name="reason" rows="2"></textarea></div>
 </div><div class="actions"><button type="button" class="btn ghost" onclick="closeModal('leaveModal')" data-i18n="cancel">取消</button><button class="btn" type="submit" data-i18n="submit_leave">提交申請</button></div></form></div></div>
 
+<!-- Job modal -->
+<div class="modal" id="jobModal"><div class="sheet"><h3><span id="jobModalTitle">新增職位</span><button class="btn ghost small" onclick="closeModal('jobModal')">✕</button></h3>
+<form id="jobForm" onsubmit="saveJob(event)"><div class="form">
+<div class="field"><label data-i18n="f_job_title">職位名稱 *</label><input name="title" required></div>
+<div class="field"><label data-i18n="th_dept">部門</label><select name="deptId" id="jobFormDept" required></select></div>
+<div class="field"><label data-i18n="f_job_type">聘用形式</label><select name="type" id="jobFormType"></select></div>
+<div class="field"><label data-i18n="f_location">工作地點</label><input name="location"></div>
+<div class="field"><label data-i18n="f_vacancies">空缺人數 *</label><input name="headcount" type="number" min="1" value="1" required></div>
+<div class="field"><label data-i18n="f_job_status">職位狀態</label><select name="status" id="jobFormStatus"></select></div>
+<div class="field"><label data-i18n="f_sal_min">最低月薪 (HK$)</label><input name="salMin" type="number" min="0" step="100"></div>
+<div class="field"><label data-i18n="f_sal_max">最高月薪 (HK$)</label><input name="salMax" type="number" min="0" step="100"></div>
+<div class="field full"><label data-i18n="f_job_desc">職位描述</label><textarea name="desc" rows="3"></textarea></div>
+</div><div class="actions"><button type="button" class="btn ghost" onclick="closeModal('jobModal')" data-i18n="cancel">取消</button><button class="btn" type="submit" data-i18n="save">儲存</button></div></form></div></div>
+
+<!-- Applicant modal -->
+<div class="modal" id="appModal"><div class="sheet"><h3><span data-i18n="app_new">新增應徵者</span><button class="btn ghost small" onclick="closeModal('appModal')">✕</button></h3>
+<form id="appForm" onsubmit="saveApplicant(event)"><div class="form">
+<div class="field"><label data-i18n="f_app_name">應徵者姓名 *</label><input name="name" required></div>
+<div class="field"><label data-i18n="th_job">職位</label><select name="jobId" id="appFormJob" required></select></div>
+<div class="field"><label data-i18n="f_app_email">電郵</label><input name="email" type="email"></div>
+<div class="field"><label data-i18n="f_app_phone">電話</label><input name="phone"></div>
+<div class="field"><label data-i18n="f_source">應徵來源</label><input name="source" data-i18n-ph="f_source_ph" placeholder="例如：JobsDB、公司網站、員工推薦"></div>
+<div class="field"><label data-i18n="th_applied">申請日期 *</label><input name="appliedDate" type="date" required></div>
+<div class="field full"><label data-i18n="f_notes">備註</label><textarea name="notes" rows="2"></textarea></div>
+</div><div class="actions"><button type="button" class="btn ghost" onclick="closeModal('appModal')" data-i18n="cancel">取消</button><button class="btn" type="submit" data-i18n="save">儲存</button></div></form></div></div>
+
 <!-- Detail modal -->
 <div class="modal" id="detailModal"><div class="sheet"><h3><span data-i18n="detail_title">員工詳情</span><button class="btn ghost small" onclick="closeModal('detailModal')">✕</button></h3><div id="detailBody"></div></div></div>
 
@@ -211,13 +255,14 @@ html[data-theme="dark"] .toast{background:#e2e8f0;color:#0f172a}
 <script>
 /* ============ i18n ============ */
 const I18N={
-zh:{brand_sub:"人力資源管理系統<br>Human Resource Management System",nav_dashboard:"儀表板",nav_employees:"員工管理",nav_departments:"部門管理",nav_attendance:"考勤管理",nav_leaves:"請假管理",nav_payroll:"薪酬管理",theme_dark:"深色模式",theme_light:"淺色模式",foot_note:"示範版 · 資料儲存在 IndexedDB",reset_data:"重設示範資料",add_employee:"新增員工",add_dept:"新增部門",add_leave:"新增申請",dept_chart:"各部門人數",pending_leaves:"待批核請假",recent_emp:"最近入職員工",emp_sub:"搜尋、新增、編輯及匯出員工資料",dept_sub:"部門架構與人手概覽",att_sub:"今日打卡記錄（可即場模擬打卡）",leave_sub:"請假申請、批核及假期餘額",pay_sub:"本月薪金與強積金（MPF）計算",export_csv:"匯出 CSV",export_pay:"匯出薪酬 CSV",search_ph:"搜尋姓名 / 編號 / 職位…",all_depts:"全部部門",all_status:"全部狀態",th_employee:"員工",th_dept:"部門",th_position:"職位",th_join:"入職日期",th_salary:"月薪 (HK$)",th_status:"狀態",th_date:"日期",th_in:"上班",th_out:"下班",th_type:"類型",th_days:"日數",th_reason:"原因",th_base:"基本月薪",th_emp_mpf:"僱員 MPF (5%)",th_er_mpf:"僱主 MPF (5%)",th_net:"實發薪金",th_al:"年假餘額",th_sick:"病假餘額",clock_in:"上班打卡",clock_out:"下班打卡",att_note:"標準上班時間 09:00，遲於 09:00 會標示為遲到。",leave_balance:"假期餘額（在職員工）",bulk_title:"批量調整薪酬",bulk_percent:"按百分比 (%)",bulk_amount:"按固定金額 (HK$)",bulk_ph:"例：5 代表 +5%／減薪入負數",bulk_preview:"預覽調整",bulk_apply:"確認套用",bulk_note:"百分比可入負數（例如 -3 即減薪 3%）；固定金額同樣可入負數。新薪金會四捨五入至整數並且不會低於 HK$0。套用前必須先預覽，套用後可在下方調整記錄撤銷最近一次。",bulk_history:"薪酬調整記錄",bulk_none:"暫時未有批量調整記錄",bulk_all:"全部在職員工",mpf_note:"MPF 計算跟香港現行規則示範：僱主及僱員各供款入息 5%，每月供款上限各 HK$1,500（有關入息上限 HK$30,000）；月入低於 HK$7,100 僱員免供款、僱主仍須供款。此頁僅作系統示範，不構成薪酬或法例意見。",f_name:"中文姓名 *",f_enname:"英文姓名",f_email:"電郵 *",f_phone:"電話",f_position:"職位 *",f_join:"入職日期 *",f_salary:"月薪 (HK$) *",f_albal:"年假餘額（日）",f_dept_name:"部門名稱 *",f_mgr:"部門主管",f_desc:"描述",f_leave_type:"假期類型 *",f_start:"開始日期 *",f_end:"結束日期 *",cancel:"取消",save:"儲存",submit_leave:"提交申請",detail_title:"員工詳情",emp_new:"新增員工",emp_edit:"編輯員工",dept_new:"新增部門",dept_edit:"編輯部門",today_is:"今日係 ",stat_active:"👥 在職員工",stat_active_sub:"位員工記錄",stat_total_prefix:"共 ",stat_depts:"🏬 部門數目",stat_depts_sub:"涵蓋全公司架構",stat_onleave:"🌴 請假中",stat_pending_suffix:"宗待批核申請",stat_pending_prefix:"另有 ",stat_rate:"🕐 今日出勤率",stat_rate_sub:"今日已打卡 ",stat_avg:"💰 平均月薪",stat_avg_sub:"在職員工平均值",people:"人",days:"日",detail:"詳情",edit:"編輯",del:"刪除",approve:"批核",reject:"拒絕",undo:"撤銷",no_pending:"🎉 暫時冇待批核申請",no_emp:"搵唔到符合條件嘅員工",no_dept:"未有部門",no_att:"未有考勤記錄",no_leave:"未有請假申請",dept_word:"部門",mgr:"主管",mgr_none:"未指定",headcount:"人數",monthly_cost:"每月薪金支出",pay_total:"💵 本月薪金總額",pay_er:"🏢 僱主 MPF 總供款",pay_net:"👛 員工實發總額",pay_count:"👥 出糧人數",st_在職:"在職",st_請假中:"請假中",st_已離職:"已離職",st_待批核:"待批核",st_已批核:"已批核",st_已拒絕:"已拒絕",st_準時:"準時",st_遲到:"遲到",st_缺勤:"缺勤",lt_年假:"年假",lt_病假:"病假",lt_事假:"事假",lt_婚假:"婚假",lt_產假:"產假",lt_陪產假:"陪產假",d_id:"員工編號",d_name:"姓名",d_email:"電郵",d_phone:"電話",d_dept_pos:"部門 / 職位",d_join:"入職日期",d_salary:"月薪",d_status:"狀態",d_balance:"假期餘額",bal_text:"年假 {a} 日 · 病假 {s} 日",leave_al_suffix:"年假餘",bulk_th_before:"現時月薪",bulk_th_after:"調整後月薪",bulk_th_change:"變動",bulk_summary:"影響 {n} 位員工 · 每月薪金總額 HK$ {b} → HK$ {a}（{d} / 月，全年 {y}）",adj_effective:"已生效",adj_undone:"已撤銷",th_adj_date:"日期",th_adj_scope:"範圍",th_adj_change:"調整",th_adj_count:"人數",th_adj_total:"每月總額變化",msg_emp_updated:"員工資料已更新",msg_emp_added:"員工已新增",msg_emp_deleted:"已刪除員工",msg_dept_updated:"部門已更新",msg_dept_added:"部門已新增",msg_dept_deleted:"部門已刪除",msg_dept_blocked:"呢個部門仲有員工，未能刪除。請先將員工轉去其他部門。",msg_confirm_del_dept:"確定刪除呢個部門？",msg_confirm_del_emp:"確定刪除員工「{n}」？此動作不能復原。",msg_clocked_in:"上班打卡 ",msg_clocked_out:"下班打卡 ",msg_already_in:"今日已經打咗上班卡",msg_no_in:"今日未有上班記錄，或已經打咗下班卡",msg_leave_submitted:"請假申請已提交，等待批核",msg_leave_approved:"申請已批核",msg_leave_rejected:"申請已拒絕",msg_end_before_start:"結束日期不能早於開始日期",msg_csv_emp:"員工 CSV 已匯出",msg_csv_pay:"薪酬 CSV 已匯出",msg_bulk_invalid:"請輸入有效嘅調整數值（百分比或金額，可用負數代表減薪）",msg_bulk_pct:"百分比減幅唔可以去到或超過 100%",msg_bulk_none:"所選範圍冇在職員工",msg_bulk_previewed:"預覽已生成，核對後按「確認套用」",msg_bulk_applied:"批量薪酬調整已套用",msg_bulk_need_preview:"請先預覽調整",msg_bulk_confirm:"確定為「{s}」批量調整薪酬（{l}）？\n影響 {n} 位員工，每月總額 {b} → {a}。",msg_bulk_undo_confirm:"確定撤銷呢次批量調整？受影響員工嘅薪金會還原到調整前。",msg_bulk_undone:"已撤銷該次批量調整",msg_reset_confirm:"確定重設為示範資料？你新增/修改嘅資料會被清除。",msg_reset_done:"已重設示範資料",msg_migrated:"已將舊版 localStorage 資料遷移至 IndexedDB"},
-en:{brand_sub:"Human Resource Management System",nav_dashboard:"Dashboard",nav_employees:"Employees",nav_departments:"Departments",nav_attendance:"Attendance",nav_leaves:"Leave",nav_payroll:"Payroll",theme_dark:"Dark mode",theme_light:"Light mode",foot_note:"Demo · Data stored in IndexedDB",reset_data:"Reset demo data",add_employee:"Add Employee",add_dept:"Add Department",add_leave:"New Request",dept_chart:"Headcount by Department",pending_leaves:"Pending Leave Requests",recent_emp:"Most Recent Joiners",emp_sub:"Search, add, edit and export employee records",dept_sub:"Department structure and headcount overview",att_sub:"Today's clock-in records (try the simulation)",leave_sub:"Leave requests, approvals and balances",pay_sub:"Monthly payroll and MPF calculation",export_csv:"Export CSV",export_pay:"Export Payroll CSV",search_ph:"Search name / ID / position…",all_depts:"All Departments",all_status:"All Statuses",th_employee:"Employee",th_dept:"Department",th_position:"Position",th_join:"Join Date",th_salary:"Salary (HK$)",th_status:"Status",th_date:"Date",th_in:"Clock In",th_out:"Clock Out",th_type:"Type",th_days:"Days",th_reason:"Reason",th_base:"Base Salary",th_emp_mpf:"Employee MPF (5%)",th_er_mpf:"Employer MPF (5%)",th_net:"Net Pay",th_al:"Annual Leave Balance",th_sick:"Sick Leave Balance",clock_in:"Clock In",clock_out:"Clock Out",att_note:"Standard start time is 09:00. Clock-ins after 09:00 are marked late.",leave_balance:"Leave Balances (Active Employees)",bulk_title:"Bulk Salary Adjustment",bulk_percent:"By percentage (%)",bulk_amount:"By fixed amount (HK$)",bulk_ph:"e.g. 5 = +5% / use negative to cut",bulk_preview:"Preview",bulk_apply:"Apply",bulk_note:"Percentages may be negative (e.g. -3 = a 3% cut); fixed amounts may also be negative. New salaries are rounded to whole dollars and never below HK$0. You must preview before applying, and the latest adjustment can be undone from the history below.",bulk_history:"Adjustment History",bulk_none:"No bulk adjustments yet",bulk_all:"All Active Employees",mpf_note:"MPF is calculated following Hong Kong rules for demonstration: employer and employee each contribute 5% of relevant income, capped at HK$1,500 per month each (income cap HK$30,000); employees earning under HK$7,100 are exempt while the employer must still contribute. For demo only; not payroll or legal advice.",f_name:"Chinese Name *",f_enname:"English Name",f_email:"Email *",f_phone:"Phone",f_position:"Position *",f_join:"Join Date *",f_salary:"Monthly Salary (HK$) *",f_albal:"Annual Leave Balance (days)",f_dept_name:"Department Name *",f_mgr:"Department Head",f_desc:"Description",f_leave_type:"Leave Type *",f_start:"Start Date *",f_end:"End Date *",cancel:"Cancel",save:"Save",submit_leave:"Submit Request",detail_title:"Employee Details",emp_new:"Add Employee",emp_edit:"Edit Employee",dept_new:"Add Department",dept_edit:"Edit Department",today_is:"Today is ",stat_active:"👥 Active Employees",stat_active_sub:" employee records in total",stat_total_prefix:"",stat_depts:"🏬 Departments",stat_depts_sub:"Across the whole company",stat_onleave:"🌴 On Leave",stat_pending_suffix:" pending requests",stat_pending_prefix:"Plus ",stat_rate:"🕐 Attendance Today",stat_rate_sub:" clocked in today",stat_avg:"💰 Average Salary",stat_avg_sub:"Average of active employees",people:"",days:" days",detail:"Details",edit:"Edit",del:"Delete",approve:"Approve",reject:"Reject",undo:"Undo",no_pending:"🎉 No pending requests",no_emp:"No employees match the filters",no_dept:"No departments yet",no_att:"No attendance records",no_leave:"No leave requests",dept_word:"Department",mgr:"Head",mgr_none:"Not assigned",headcount:"Headcount",monthly_cost:"Monthly salary cost",pay_total:"💵 Total Payroll",pay_er:"🏢 Employer MPF Total",pay_net:"👛 Total Net Pay",pay_count:"👥 Paid Employees",st_在職:"Active",st_請假中:"On Leave",st_已離職:"Left",st_待批核:"Pending",st_已批核:"Approved",st_已拒絕:"Rejected",st_準時:"On Time",st_遲到:"Late",st_缺勤:"Absent",lt_年假:"Annual Leave",lt_病假:"Sick Leave",lt_事假:"Personal Leave",lt_婚假:"Marriage Leave",lt_產假:"Maternity Leave",lt_陪產假:"Paternity Leave",d_id:"Employee ID",d_name:"Name",d_email:"Email",d_phone:"Phone",d_dept_pos:"Department / Position",d_join:"Join Date",d_salary:"Salary",d_status:"Status",d_balance:"Leave Balance",bal_text:"Annual {a} days · Sick {s} days",leave_al_suffix:"AL left",bulk_th_before:"Current Salary",bulk_th_after:"New Salary",bulk_th_change:"Change",bulk_summary:"Affects {n} employees · Monthly total HK$ {b} → HK$ {a} ({d} / month, {y} per year)",adj_effective:"Effective",adj_undone:"Undone",th_adj_date:"Date",th_adj_scope:"Scope",th_adj_change:"Adjustment",th_adj_count:"People",th_adj_total:"Monthly Total Change",msg_emp_updated:"Employee updated",msg_emp_added:"Employee added",msg_dept_updated:"Department updated",msg_emp_deleted:"Employee deleted",msg_dept_added:"Department added",msg_dept_deleted:"Department deleted",msg_dept_blocked:"This department still has employees and cannot be deleted. Move them first.",msg_confirm_del_dept:"Delete this department?",msg_confirm_del_emp:"Delete employee “{n}”? This cannot be undone.",msg_clocked_in:"Clocked in at ",msg_clocked_out:"Clocked out at ",msg_already_in:"Already clocked in today",msg_no_in:"No clock-in record today, or already clocked out",msg_leave_submitted:"Leave request submitted for approval",msg_leave_approved:"Request approved",msg_leave_rejected:"Request rejected",msg_end_before_start:"End date cannot be earlier than start date",msg_csv_emp:"Employee CSV exported",msg_csv_pay:"Payroll CSV exported",msg_bulk_invalid:"Enter a valid adjustment value (percentage or amount; negative means a cut)",msg_bulk_pct:"A percentage cut cannot reach or exceed 100%",msg_bulk_none:"No active employees in the selected scope",msg_bulk_previewed:"Preview generated — check it, then Apply",msg_bulk_applied:"Bulk salary adjustment applied",msg_bulk_need_preview:"Please preview the adjustment first",msg_bulk_confirm:"Apply bulk salary adjustment ({l}) to “{s}”?\nAffects {n} employees, monthly total {b} → {a}.",msg_bulk_undo_confirm:"Undo this bulk adjustment? Affected salaries will be restored.",msg_bulk_undone:"Bulk adjustment undone",msg_reset_confirm:"Reset to demo data? Your changes will be cleared.",msg_reset_done:"Demo data reset",msg_migrated:"Legacy localStorage data migrated to IndexedDB"}
+zh:{brand_sub:"人力資源管理系統<br>Human Resource Management System",nav_dashboard:"儀表板",nav_employees:"員工管理",nav_departments:"部門管理",nav_attendance:"考勤管理",nav_leaves:"請假管理",nav_payroll:"薪酬管理",nav_recruitment:"招聘管理",theme_dark:"深色模式",theme_light:"淺色模式",foot_note:"示範版 · 資料儲存在 IndexedDB",reset_data:"重設示範資料",add_employee:"新增員工",add_dept:"新增部門",add_leave:"新增申請",dept_chart:"各部門人數",pending_leaves:"待批核請假",recent_emp:"最近入職員工",emp_sub:"搜尋、新增、編輯及匯出員工資料",dept_sub:"部門架構與人手概覽",att_sub:"今日打卡記錄（可即場模擬打卡）",leave_sub:"請假申請、批核及假期餘額",pay_sub:"本月薪金與強積金（MPF）計算",export_csv:"匯出 CSV",export_pay:"匯出薪酬 CSV",search_ph:"搜尋姓名 / 編號 / 職位…",all_depts:"全部部門",all_status:"全部狀態",th_employee:"員工",th_dept:"部門",th_position:"職位",th_join:"入職日期",th_salary:"月薪 (HK$)",th_status:"狀態",th_date:"日期",th_in:"上班",th_out:"下班",th_type:"類型",th_days:"日數",th_reason:"原因",th_base:"基本月薪",th_emp_mpf:"僱員 MPF (5%)",th_er_mpf:"僱主 MPF (5%)",th_net:"實發薪金",th_al:"年假餘額",th_sick:"病假餘額",clock_in:"上班打卡",clock_out:"下班打卡",att_note:"標準上班時間 09:00，遲於 09:00 會標示為遲到。",leave_balance:"假期餘額（在職員工）",bulk_title:"批量調整薪酬",bulk_percent:"按百分比 (%)",bulk_amount:"按固定金額 (HK$)",bulk_ph:"例：5 代表 +5%／減薪入負數",bulk_preview:"預覽調整",bulk_apply:"確認套用",bulk_note:"百分比可入負數（例如 -3 即減薪 3%）；固定金額同樣可入負數。新薪金會四捨五入至整數並且不會低於 HK$0。套用前必須先預覽，套用後可在下方調整記錄撤銷最近一次。",bulk_history:"薪酬調整記錄",bulk_none:"暫時未有批量調整記錄",bulk_all:"全部在職員工",mpf_note:"MPF 計算跟香港現行規則示範：僱主及僱員各供款入息 5%，每月供款上限各 HK$1,500（有關入息上限 HK$30,000）；月入低於 HK$7,100 僱員免供款、僱主仍須供款。此頁僅作系統示範，不構成薪酬或法例意見。",f_name:"中文姓名 *",f_enname:"英文姓名",f_email:"電郵 *",f_phone:"電話",f_position:"職位 *",f_join:"入職日期 *",f_salary:"月薪 (HK$) *",f_albal:"年假餘額（日）",f_dept_name:"部門名稱 *",f_mgr:"部門主管",f_desc:"描述",f_leave_type:"假期類型 *",f_start:"開始日期 *",f_end:"結束日期 *",cancel:"取消",save:"儲存",submit_leave:"提交申請",detail_title:"員工詳情",emp_new:"新增員工",emp_edit:"編輯員工",dept_new:"新增部門",dept_edit:"編輯部門",today_is:"今日係 ",stat_active:"👥 在職員工",stat_active_sub:"位員工記錄",stat_total_prefix:"共 ",stat_depts:"🏬 部門數目",stat_depts_sub:"涵蓋全公司架構",stat_onleave:"🌴 請假中",stat_pending_suffix:"宗待批核申請",stat_pending_prefix:"另有 ",stat_rate:"🕐 今日出勤率",stat_rate_sub:"今日已打卡 ",stat_avg:"💰 平均月薪",stat_avg_sub:"在職員工平均值",people:"人",days:"日",detail:"詳情",edit:"編輯",del:"刪除",approve:"批核",reject:"拒絕",undo:"撤銷",no_pending:"🎉 暫時冇待批核申請",no_emp:"搵唔到符合條件嘅員工",no_dept:"未有部門",no_att:"未有考勤記錄",no_leave:"未有請假申請",dept_word:"部門",mgr:"主管",mgr_none:"未指定",headcount:"人數",monthly_cost:"每月薪金支出",pay_total:"💵 本月薪金總額",pay_er:"🏢 僱主 MPF 總供款",pay_net:"👛 員工實發總額",pay_count:"👥 出糧人數",st_在職:"在職",st_請假中:"請假中",st_已離職:"已離職",st_待批核:"待批核",st_已批核:"已批核",st_已拒絕:"已拒絕",st_準時:"準時",st_遲到:"遲到",st_缺勤:"缺勤",lt_年假:"年假",lt_病假:"病假",lt_事假:"事假",lt_婚假:"婚假",lt_產假:"產假",lt_陪產假:"陪產假",d_id:"員工編號",d_name:"姓名",d_email:"電郵",d_phone:"電話",d_dept_pos:"部門 / 職位",d_join:"入職日期",d_salary:"月薪",d_status:"狀態",d_balance:"假期餘額",bal_text:"年假 {a} 日 · 病假 {s} 日",leave_al_suffix:"年假餘",bulk_th_before:"現時月薪",bulk_th_after:"調整後月薪",bulk_th_change:"變動",bulk_summary:"影響 {n} 位員工 · 每月薪金總額 HK$ {b} → HK$ {a}（{d} / 月，全年 {y}）",adj_effective:"已生效",adj_undone:"已撤銷",th_adj_date:"日期",th_adj_scope:"範圍",th_adj_change:"調整",th_adj_count:"人數",th_adj_total:"每月總額變化",msg_emp_updated:"員工資料已更新",msg_emp_added:"員工已新增",msg_emp_deleted:"已刪除員工",msg_dept_updated:"部門已更新",msg_dept_added:"部門已新增",msg_dept_deleted:"部門已刪除",msg_dept_blocked:"呢個部門仲有員工，未能刪除。請先將員工轉去其他部門。",msg_confirm_del_dept:"確定刪除呢個部門？",msg_confirm_del_emp:"確定刪除員工「{n}」？此動作不能復原。",msg_clocked_in:"上班打卡 ",msg_clocked_out:"下班打卡 ",msg_already_in:"今日已經打咗上班卡",msg_no_in:"今日未有上班記錄，或已經打咗下班卡",msg_leave_submitted:"請假申請已提交，等待批核",msg_leave_approved:"申請已批核",msg_leave_rejected:"申請已拒絕",msg_end_before_start:"結束日期不能早於開始日期",msg_csv_emp:"員工 CSV 已匯出",msg_csv_pay:"薪酬 CSV 已匯出",msg_bulk_invalid:"請輸入有效嘅調整數值（百分比或金額，可用負數代表減薪）",msg_bulk_pct:"百分比減幅唔可以去到或超過 100%",msg_bulk_none:"所選範圍冇在職員工",msg_bulk_previewed:"預覽已生成，核對後按「確認套用」",msg_bulk_applied:"批量薪酬調整已套用",msg_bulk_need_preview:"請先預覽調整",msg_bulk_confirm:"確定為「{s}」批量調整薪酬（{l}）？\n影響 {n} 位員工，每月總額 {b} → {a}。",msg_bulk_undo_confirm:"確定撤銷呢次批量調整？受影響員工嘅薪金會還原到調整前。",msg_bulk_undone:"已撤銷該次批量調整",msg_reset_confirm:"確定重設為示範資料？你新增/修改嘅資料會被清除。",msg_reset_done:"已重設示範資料",msg_migrated:"已將舊版 localStorage 資料遷移至 IndexedDB",rec_sub:"職位空缺、應徵者及面試階段一覽",add_job:"新增職位",add_applicant:"新增應徵者",rec_open_jobs:"🧲 開放職位",rec_total_apps:"📥 應徵者總數",rec_interviewing:"💬 面試中",rec_interviewing_short:"面試中",rec_hired:"✅ 已聘用",rec_card2_sub:"面試中 {n} 人",rec_card3_sub:"已出 offer {n} 人",rec_card4_sub:"已拒絕 {n} 人",th_job:"職位",th_job_type:"形式",th_vacancies:"空缺數",th_salary_range:"薪酬範圍 (HK$)",th_posted:"刊登日期",th_applicants:"應徵者",th_source:"來源",th_stage:"階段",th_contact:"聯絡",th_notes:"備註",th_applied:"申請日期",job_new:"新增職位",job_edit:"編輯職位",app_new:"新增應徵者",f_job_title:"職位名稱 *",f_job_type:"聘用形式",f_vacancies:"空缺人數 *",f_sal_min:"最低月薪 (HK$)",f_sal_max:"最高月薪 (HK$)",f_job_status:"職位狀態",f_job_desc:"職位描述",f_location:"工作地點",f_source:"應徵來源",f_notes:"備註",f_app_name:"應徵者姓名 *",f_app_email:"電郵",f_app_phone:"電話",f_source_ph:"例如：JobsDB、公司網站、員工推薦",st_開放:"開放",st_已暫停:"已暫停",st_已關閉:"已關閉",st_已申請:"已申請",st_面試中:"面試中",st_已出offer:"已出 offer",st_已聘用:"已聘用",st_已拒絕:"已拒絕",jt_全職:"全職",jt_兼職:"兼職",jt_合約:"合約",rec_no_jobs:"未有職位空缺",rec_no_apps:"未有符合條件嘅應徵者",rec_all_stages:"全部階段",rec_all_jobs:"全部職位",rec_jobs_title:"職位空缺",rec_apps_title:"應徵者",rec_view_apps:"查看應徵者",advance_stage:"推進階段",reject_app:"拒絕",hire_app:"轉為員工",reopen_app:"重新考慮",close_job:"關閉職位",reopen_job:"重新開放",msg_job_added:"職位已新增",msg_job_updated:"職位已更新",msg_job_deleted:"職位已刪除",msg_job_blocked:"呢個職位仲有應徵者，未能刪除。請先刪除應徵者。",msg_confirm_del_job:"確定刪除呢個職位？",msg_confirm_del_app:"確定刪除應徵者「{n}」？",msg_app_added:"應徵者已新增",msg_app_deleted:"應徵者已刪除",msg_app_stage:"已推進至「{s}」",msg_app_rejected:"已拒絕應徵者",msg_app_reopened:"已將應徵者移回「已申請」",msg_app_converted:"已轉為正式員工",msg_job_closed:"職位已關閉",msg_job_reopened:"職位已重新開放",msg_sal_range:"最高月薪不能低於最低月薪",stat_jobs:"🧲 開放職位",stat_jobs_sub:"共 {n} 位應徵者",rec_converted:"已轉為員工"},
+en:{brand_sub:"Human Resource Management System",nav_dashboard:"Dashboard",nav_employees:"Employees",nav_departments:"Departments",nav_attendance:"Attendance",nav_leaves:"Leave",nav_payroll:"Payroll",nav_recruitment:"Recruitment",theme_dark:"Dark mode",theme_light:"Light mode",foot_note:"Demo · Data stored in IndexedDB",reset_data:"Reset demo data",add_employee:"Add Employee",add_dept:"Add Department",add_leave:"New Request",dept_chart:"Headcount by Department",pending_leaves:"Pending Leave Requests",recent_emp:"Most Recent Joiners",emp_sub:"Search, add, edit and export employee records",dept_sub:"Department structure and headcount overview",att_sub:"Today's clock-in records (try the simulation)",leave_sub:"Leave requests, approvals and balances",pay_sub:"Monthly payroll and MPF calculation",export_csv:"Export CSV",export_pay:"Export Payroll CSV",search_ph:"Search name / ID / position…",all_depts:"All Departments",all_status:"All Statuses",th_employee:"Employee",th_dept:"Department",th_position:"Position",th_join:"Join Date",th_salary:"Salary (HK$)",th_status:"Status",th_date:"Date",th_in:"Clock In",th_out:"Clock Out",th_type:"Type",th_days:"Days",th_reason:"Reason",th_base:"Base Salary",th_emp_mpf:"Employee MPF (5%)",th_er_mpf:"Employer MPF (5%)",th_net:"Net Pay",th_al:"Annual Leave Balance",th_sick:"Sick Leave Balance",clock_in:"Clock In",clock_out:"Clock Out",att_note:"Standard start time is 09:00. Clock-ins after 09:00 are marked late.",leave_balance:"Leave Balances (Active Employees)",bulk_title:"Bulk Salary Adjustment",bulk_percent:"By percentage (%)",bulk_amount:"By fixed amount (HK$)",bulk_ph:"e.g. 5 = +5% / use negative to cut",bulk_preview:"Preview",bulk_apply:"Apply",bulk_note:"Percentages may be negative (e.g. -3 = a 3% cut); fixed amounts may also be negative. New salaries are rounded to whole dollars and never below HK$0. You must preview before applying, and the latest adjustment can be undone from the history below.",bulk_history:"Adjustment History",bulk_none:"No bulk adjustments yet",bulk_all:"All Active Employees",mpf_note:"MPF is calculated following Hong Kong rules for demonstration: employer and employee each contribute 5% of relevant income, capped at HK$1,500 per month each (income cap HK$30,000); employees earning under HK$7,100 are exempt while the employer must still contribute. For demo only; not payroll or legal advice.",f_name:"Chinese Name *",f_enname:"English Name",f_email:"Email *",f_phone:"Phone",f_position:"Position *",f_join:"Join Date *",f_salary:"Monthly Salary (HK$) *",f_albal:"Annual Leave Balance (days)",f_dept_name:"Department Name *",f_mgr:"Department Head",f_desc:"Description",f_leave_type:"Leave Type *",f_start:"Start Date *",f_end:"End Date *",cancel:"Cancel",save:"Save",submit_leave:"Submit Request",detail_title:"Employee Details",emp_new:"Add Employee",emp_edit:"Edit Employee",dept_new:"Add Department",dept_edit:"Edit Department",today_is:"Today is ",stat_active:"👥 Active Employees",stat_active_sub:" employee records in total",stat_total_prefix:"",stat_depts:"🏬 Departments",stat_depts_sub:"Across the whole company",stat_onleave:"🌴 On Leave",stat_pending_suffix:" pending requests",stat_pending_prefix:"Plus ",stat_rate:"🕐 Attendance Today",stat_rate_sub:" clocked in today",stat_avg:"💰 Average Salary",stat_avg_sub:"Average of active employees",people:"",days:" days",detail:"Details",edit:"Edit",del:"Delete",approve:"Approve",reject:"Reject",undo:"Undo",no_pending:"🎉 No pending requests",no_emp:"No employees match the filters",no_dept:"No departments yet",no_att:"No attendance records",no_leave:"No leave requests",dept_word:"Department",mgr:"Head",mgr_none:"Not assigned",headcount:"Headcount",monthly_cost:"Monthly salary cost",pay_total:"💵 Total Payroll",pay_er:"🏢 Employer MPF Total",pay_net:"👛 Total Net Pay",pay_count:"👥 Paid Employees",st_在職:"Active",st_請假中:"On Leave",st_已離職:"Left",st_待批核:"Pending",st_已批核:"Approved",st_已拒絕:"Rejected",st_準時:"On Time",st_遲到:"Late",st_缺勤:"Absent",lt_年假:"Annual Leave",lt_病假:"Sick Leave",lt_事假:"Personal Leave",lt_婚假:"Marriage Leave",lt_產假:"Maternity Leave",lt_陪產假:"Paternity Leave",d_id:"Employee ID",d_name:"Name",d_email:"Email",d_phone:"Phone",d_dept_pos:"Department / Position",d_join:"Join Date",d_salary:"Salary",d_status:"Status",d_balance:"Leave Balance",bal_text:"Annual {a} days · Sick {s} days",leave_al_suffix:"AL left",bulk_th_before:"Current Salary",bulk_th_after:"New Salary",bulk_th_change:"Change",bulk_summary:"Affects {n} employees · Monthly total HK$ {b} → HK$ {a} ({d} / month, {y} per year)",adj_effective:"Effective",adj_undone:"Undone",th_adj_date:"Date",th_adj_scope:"Scope",th_adj_change:"Adjustment",th_adj_count:"People",th_adj_total:"Monthly Total Change",msg_emp_updated:"Employee updated",msg_emp_added:"Employee added",msg_dept_updated:"Department updated",msg_emp_deleted:"Employee deleted",msg_dept_added:"Department added",msg_dept_deleted:"Department deleted",msg_dept_blocked:"This department still has employees and cannot be deleted. Move them first.",msg_confirm_del_dept:"Delete this department?",msg_confirm_del_emp:"Delete employee “{n}”? This cannot be undone.",msg_clocked_in:"Clocked in at ",msg_clocked_out:"Clocked out at ",msg_already_in:"Already clocked in today",msg_no_in:"No clock-in record today, or already clocked out",msg_leave_submitted:"Leave request submitted for approval",msg_leave_approved:"Request approved",msg_leave_rejected:"Request rejected",msg_end_before_start:"End date cannot be earlier than start date",msg_csv_emp:"Employee CSV exported",msg_csv_pay:"Payroll CSV exported",msg_bulk_invalid:"Enter a valid adjustment value (percentage or amount; negative means a cut)",msg_bulk_pct:"A percentage cut cannot reach or exceed 100%",msg_bulk_none:"No active employees in the selected scope",msg_bulk_previewed:"Preview generated — check it, then Apply",msg_bulk_applied:"Bulk salary adjustment applied",msg_bulk_need_preview:"Please preview the adjustment first",msg_bulk_confirm:"Apply bulk salary adjustment ({l}) to “{s}”?\nAffects {n} employees, monthly total {b} → {a}.",msg_bulk_undo_confirm:"Undo this bulk adjustment? Affected salaries will be restored.",msg_bulk_undone:"Bulk adjustment undone",msg_reset_confirm:"Reset to demo data? Your changes will be cleared.",msg_reset_done:"Demo data reset",msg_migrated:"Legacy localStorage data migrated to IndexedDB",rec_sub:"Job openings, applicants and interview stages at a glance",add_job:"New Job",add_applicant:"Add Applicant",rec_open_jobs:"🧲 Open Jobs",rec_total_apps:"📥 Total Applicants",rec_interviewing:"💬 In Interview",rec_interviewing_short:"interviewing",rec_hired:"✅ Hired",rec_card2_sub:"{n} in interview",rec_card3_sub:"{n} with offers made",rec_card4_sub:"{n} rejected",th_job:"Job",th_job_type:"Type",th_vacancies:"Openings",th_salary_range:"Salary Range (HK$)",th_posted:"Posted",th_applicants:"Applicants",th_source:"Source",th_stage:"Stage",th_contact:"Contact",th_notes:"Notes",th_applied:"Applied",job_new:"New Job",job_edit:"Edit Job",app_new:"Add Applicant",f_job_title:"Job Title *",f_job_type:"Employment Type",f_vacancies:"Number of Openings *",f_sal_min:"Minimum Salary (HK$)",f_sal_max:"Maximum Salary (HK$)",f_job_status:"Status",f_job_desc:"Job Description",f_location:"Location",f_source:"Source",f_notes:"Notes",f_app_name:"Applicant Name *",f_app_email:"Email",f_app_phone:"Phone",f_source_ph:"e.g. JobsDB, company website, referral",st_開放:"Open",st_已暫停:"Paused",st_已關閉:"Closed",st_已申請:"Applied",st_面試中:"Interviewing",st_已出offer:"Offer Made",st_已聘用:"Hired",st_已拒絕:"Rejected",jt_全職:"Full-time",jt_兼職:"Part-time",jt_合約:"Contract",rec_no_jobs:"No job openings yet",rec_no_apps:"No applicants match the filters",rec_all_stages:"All Stages",rec_all_jobs:"All Jobs",rec_jobs_title:"Job Openings",rec_apps_title:"Applicants",rec_view_apps:"View Applicants",advance_stage:"Advance Stage",reject_app:"Reject",hire_app:"Convert to Employee",reopen_app:"Reconsider",close_job:"Close Job",reopen_job:"Reopen",msg_job_added:"Job added",msg_job_updated:"Job updated",msg_job_deleted:"Job deleted",msg_job_blocked:"This job still has applicants and cannot be deleted. Remove the applicants first.",msg_confirm_del_job:"Delete this job?",msg_confirm_del_app:"Delete applicant “{n}”?",msg_app_added:"Applicant added",msg_app_deleted:"Applicant deleted",msg_app_stage:"Advanced to “{s}”",msg_app_rejected:"Applicant rejected",msg_app_reopened:"Applicant moved back to “Applied”",msg_app_converted:"Converted to employee",msg_job_closed:"Job closed",msg_job_reopened:"Job reopened",msg_sal_range:"Maximum salary cannot be below minimum salary",stat_jobs:"🧲 Open Jobs",stat_jobs_sub:"{n} applicants in total",rec_converted:"Converted"}
 };
 let LANG='zh', THEME='light';
 function t(k){return (I18N[LANG]&&I18N[LANG][k])||I18N.zh[k]||k}
 function st(s){return t('st_'+s)||s}
 function lt(s){return t('lt_'+s)||s}
+function jt(v){return t('jt_'+v)||v}
 
 /* ============ IndexedDB storage ============ */
 const IDB_NAME='hrms-db', IDB_STORE='kv';
@@ -255,9 +300,21 @@ function seed(){
     {id:'L1',empId:'E006',type:'年假',start:today,end:today,days:1,reason:'家庭事務',status:'待批核',applied:today},
     {id:'L2',empId:'E003',type:'病假',start:today,end:today,days:1,reason:'感冒求診',status:'已批核',applied:today},
     {id:'L3',empId:'E011',type:'年假',start:'2026-12-24',end:'2026-12-31',days:6,reason:'聖誕外遊',status:'待批核',applied:today}];
-  return {depts,emps,att,leaves,salaryAdjustments:[],seq:{emp:13,dept:6,leave:4,att:100,adj:1}};
+  const jobs=[
+    {id:'J1',title:'高級系統工程師',deptId:'D1',type:'全職',location:'金鐘總行',headcount:2,salMin:45000,salMax:60000,status:'開放',desc:'負責核心銀行系統開發及維運，熟悉 Java / Spring Boot。',postedDate:'2026-11-10'},
+    {id:'J2',title:'人力資源主任',deptId:'D2',type:'全職',location:'金鐘總行',headcount:1,salMin:25000,salMax:32000,status:'開放',desc:'處理招聘、入職及員工檔案管理。',postedDate:'2026-11-18'},
+    {id:'J3',title:'市場推廣助理',deptId:'D5',type:'合約',location:'金鐘總行',headcount:1,salMin:20000,salMax:24000,status:'已暫停',desc:'協助社交媒體推廣及活動籌備，為期 6 個月合約。',postedDate:'2026-11-05'}];
+  const applicants=[
+    {id:'A1',jobId:'J1',name:'陳小明',email:'xiaoming.chan@example.com',phone:'91234567',source:'JobsDB',stage:'已申請',appliedDate:'2026-11-19',notes:'5 年 Java 經驗',converted:false},
+    {id:'A2',jobId:'J1',name:'何美琪',email:'meiki.ho@example.com',phone:'92345678',source:'公司網站',stage:'面試中',appliedDate:'2026-11-17',notes:'第二輪面試 11 月 25 日',converted:false},
+    {id:'A3',jobId:'J1',name:'許志豪',email:'chiho.hui@example.com',phone:'93456789',source:'員工推薦',stage:'已出offer',appliedDate:'2026-11-12',notes:'Offer 月薪 HK$52,000，待回覆',converted:false},
+    {id:'A4',jobId:'J2',name:'梁家俊',email:'kajun.leung@example.com',phone:'94567890',source:'JobsDB',stage:'面試中',appliedDate:'2026-11-20',notes:'',converted:false},
+    {id:'A5',jobId:'J2',name:'陳穎彤',email:'wingtung.chan@example.com',phone:'95678901',source:'LinkedIn',stage:'已申請',appliedDate:'2026-11-21',notes:'',converted:false},
+    {id:'A6',jobId:'J3',name:'吳子軒',email:'tszhin.ng@example.com',phone:'96789012',source:'公司網站',stage:'已拒絕',appliedDate:'2026-11-08',notes:'經驗與職位不符',converted:false},
+    {id:'A7',jobId:'J1',name:'林俊傑',email:'chunjie.lam@example.com',phone:'97890123',source:'獵頭公司',stage:'已聘用',appliedDate:'2026-11-09',notes:'已接受 offer，12 月 1 日入職',converted:false}];
+  return {depts,emps,att,leaves,jobs,applicants,salaryAdjustments:[],seq:{emp:13,dept:6,leave:4,att:100,adj:1,job:4,app:8}};
 }
-function normalize(d){if(!Array.isArray(d.salaryAdjustments))d.salaryAdjustments=[];if(!d.seq)d.seq={emp:100,dept:100,leave:100,att:100,adj:1};if(!d.seq.adj)d.seq.adj=d.salaryAdjustments.length+1;return d}
+function normalize(d){if(!Array.isArray(d.salaryAdjustments))d.salaryAdjustments=[];if(!Array.isArray(d.jobs))d.jobs=[];if(!Array.isArray(d.applicants))d.applicants=[];if(!d.seq)d.seq={emp:100,dept:100,leave:100,att:100,adj:1};if(!d.seq.adj)d.seq.adj=d.salaryAdjustments.length+1;if(!d.seq.job)d.seq.job=d.jobs.length+1;if(!d.seq.app)d.seq.app=d.applicants.length+1;return d}
 let DB=null;
 function save(){if(DB)idbSet('state',DB).catch(e=>console.error('IDB save failed',e))}
 async function savePrefs(){try{await idbSet('ui',{theme:THEME,lang:LANG})}catch(e){}}
@@ -267,7 +324,7 @@ function deptName(id){const d=DB.depts.find(x=>x.id===id);return d?d.name:'—'}
 function empById(id){return DB.emps.find(x=>x.id===id)}
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function toast(msg){const el=$('toast');el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',2400)}
-function badge(s){const m={'在職':'b-green','請假中':'b-amber','已離職':'b-gray','已批核':'b-green','待批核':'b-amber','已拒絕':'b-red','準時':'b-green','遲到':'b-amber','缺勤':'b-red'};return `<span class="badge ${m[s]||'b-blue'}">${esc(st(s))}</span>`}
+function badge(s){const m={'在職':'b-green','請假中':'b-amber','已離職':'b-gray','已批核':'b-green','待批核':'b-amber','已拒絕':'b-red','準時':'b-green','遲到':'b-amber','缺勤':'b-red','開放':'b-green','已暫停':'b-amber','已關閉':'b-gray','已申請':'b-blue','面試中':'b-amber','已出offer':'b-green','已聘用':'b-green'};return `<span class="badge ${m[s]||'b-blue'}">${esc(st(s))}</span>`}
 function personCell(e){return `<div class="person"><span class="avatar" style="background:${e.color}">${esc(e.name[0]||'?')}</span><span>${esc(e.name)}<small>${esc(e.id)} · ${esc(e.enName||'')}</small></span></div>`}
 
 /* ============ Theme & Language ============ */
@@ -288,6 +345,7 @@ function buildStaticSelects(){
   $('empStatusFilter').value=cur;
   $('empFormStatus').innerHTML=['在職','請假中','已離職'].map(s=>`<option value="${s}">${st(s)}</option>`).join('');
   $('leaveTypeSel').innerHTML=['年假','病假','事假','婚假','產假','陪產假'].map(s=>`<option value="${s}">${lt(s)}</option>`).join('');
+  const rsf=$('recStageFilter');const rc=rsf.value;rsf.innerHTML=`<option value="">${t('rec_all_stages')}</option>`+[...STAGES,'已拒絕'].map(s=>`<option value="${s}">${st(s)}</option>`).join('');rsf.value=rc;
 }
 
 /* ============ Navigation ============ */
@@ -308,7 +366,8 @@ function renderDashboard(){
     [t('stat_depts'),DB.depts.length,t('stat_depts_sub')],
     [t('stat_onleave'),onLeave,t('stat_pending_prefix')+pending+' '+t('stat_pending_suffix')],
     [t('stat_rate'),rate+'%',attToday.length+t('stat_rate_sub')],
-    [t('stat_avg'),'HK$'+fmt(avg),t('stat_avg_sub')]
+    [t('stat_avg'),'HK$'+fmt(avg),t('stat_avg_sub')],
+    [t('stat_jobs'),DB.jobs.filter(j=>j.status==='開放').length,t('stat_jobs_sub').replace('{n}',DB.applicants.length)]
   ].map(c=>`<div class="card"><div class="k">${c[0]}</div><div class="v">${c[1]}</div><div class="d">${c[2]}</div></div>`).join('');
   const max=Math.max(1,...DB.depts.map(d=>DB.emps.filter(e=>e.deptId===d.id&&e.status!=='已離職').length));
   $('deptBars').innerHTML=DB.depts.map(d=>{const n=DB.emps.filter(e=>e.deptId===d.id&&e.status!=='已離職').length;return `<div class="bar-row"><span class="name">${esc(d.name)}</span><span class="bar-track"><span class="bar-fill" style="width:${n/max*100}%"></span></span><span class="num">${n} ${t('people')}</span></div>`}).join('')||`<div class="empty">${t('no_dept')}</div>`;
@@ -414,10 +473,112 @@ function renderBulkHistory(){
   el.innerHTML=list.length?`<div style="overflow:auto"><table><thead><tr><th>${t('th_adj_date')}</th><th>${t('th_adj_scope')}</th><th>${t('th_adj_change')}</th><th>${t('th_adj_count')}</th><th>${t('th_adj_total')}</th><th>${t('th_status')}</th><th></th></tr></thead><tbody>${list.map(a=>{const d=a.totalAfter-a.totalBefore;const label=a.mode==='percent'?((a.value>0?'+':'')+a.value+'%'):((a.value>0?'+HK$ ':'-HK$ ')+fmt(Math.abs(a.value)));return `<tr><td>${esc(a.date)} ${esc(a.time||'')}</td><td>${esc(a.scopeLabel)}</td><td>${esc(label)}</td><td>${a.count}</td><td>${fmt(a.totalBefore)} → ${fmt(a.totalAfter)} (${d>0?'+':''}${fmt(d)})</td><td>${a.undone?`<span class="badge b-gray">${t('adj_undone')}</span>`:`<span class="badge b-green">${t('adj_effective')}</span>`}</td><td>${a.undone?'':`<button class="btn small danger" onclick="undoBulk('${a.id}')">${t('undo')}</button>`}</td></tr>`}).join('')}</tbody></table></div>`:`<div class="empty">${t('bulk_none')}</div>`;
 }
 
+/* ============ Recruitment ============ */
+const STAGES=['已申請','面試中','已出offer','已聘用'];
+function jobById(id){return DB.jobs.find(x=>x.id===id)}
+function stageIdx(s){return STAGES.indexOf(s)}
+function fillRecJobFilter(){
+  const sel=$('recJobFilter');const cur=sel.value;
+  sel.innerHTML=`<option value="">${t('rec_all_jobs')}</option>`+DB.jobs.map(j=>`<option value="${j.id}">${esc(j.title)}（${esc(deptName(j.deptId))}）</option>`).join('');
+  sel.value=[...sel.options].some(o=>o.value===cur)?cur:'';
+}
+function renderRecruitment(){
+  const openJobs=DB.jobs.filter(j=>j.status==='開放').length;
+  const interviewing=DB.applicants.filter(a=>a.stage==='面試中').length;
+  const offered=DB.applicants.filter(a=>a.stage==='已出offer').length;
+  const hired=DB.applicants.filter(a=>a.stage==='已聘用').length;
+  const rejected=DB.applicants.filter(a=>a.stage==='已拒絕').length;
+  $('recCards').innerHTML=[
+    [t('rec_open_jobs'),openJobs,t('stat_jobs_sub').replace('{n}',DB.applicants.length)],
+    [t('rec_total_apps'),DB.applicants.length,t('rec_card2_sub').replace('{n}',interviewing)],
+    [t('rec_interviewing'),interviewing,t('rec_card3_sub').replace('{n}',offered)],
+    [t('rec_hired'),hired,t('rec_card4_sub').replace('{n}',rejected)]
+  ].map(c=>`<div class="card"><div class="k">${c[0]}</div><div class="v">${c[1]}</div><div class="d">${c[2]}</div></div>`).join('');
+  fillRecJobFilter();
+  $('recJobsTable').innerHTML=DB.jobs.length?DB.jobs.map(j=>{
+    const apps=DB.applicants.filter(a=>a.jobId===j.id);const intv=apps.filter(a=>a.stage==='面試中').length;
+    return `<tr><td><b>${esc(j.title)}</b><br><small style="color:var(--muted)">${esc(j.location||'')}</small></td><td>${esc(deptName(j.deptId))}</td><td>${esc(jt(j.type))}</td><td>${j.headcount}</td><td>HK$ ${fmt(j.salMin||0)} – ${fmt(j.salMax||0)}</td><td>${esc(j.postedDate)}</td><td>${badge(j.status)}</td><td>${apps.length}${intv?` <span class="note">(${intv} ${t('rec_interviewing_short')})</span>`:''}</td><td style="white-space:nowrap"><button class="btn small ghost" onclick="viewJobApplicants('${j.id}')">${t('rec_view_apps')}</button> <button class="btn small ghost" onclick="openJobModal('${j.id}')">${t('edit')}</button> <button class="btn small ghost" onclick="toggleJobStatus('${j.id}')">${t(j.status==='開放'?'close_job':'reopen_job')}</button> <button class="btn small danger" onclick="delJob('${j.id}')">${t('del')}</button></td></tr>`}).join(''):`<tr><td colspan="9"><div class="empty">${t('rec_no_jobs')}</div></td></tr>`;
+  renderApplicants();
+}
+function renderApplicants(){
+  const jf=$('recJobFilter').value,sf=$('recStageFilter').value;
+  const list=DB.applicants.filter(a=>(!jf||a.jobId===jf)&&(!sf||a.stage===sf));
+  $('recAppTable').innerHTML=list.length?[...list].reverse().map(a=>{
+    const j=jobById(a.jobId);const idx=stageIdx(a.stage);const next=STAGES[idx+1];
+    let acts='';
+    if(idx>=0&&idx<STAGES.length-1)acts+=`<button class="btn small green" onclick="advanceApplicant('${a.id}')">${t('advance_stage')} → ${esc(st(next))}</button> `;
+    if(a.stage==='已拒絕')acts+=`<button class="btn small ghost" onclick="reopenApplicant('${a.id}')">${t('reopen_app')}</button> `;
+    if(a.stage!=='已拒絕'&&a.stage!=='已聘用')acts+=`<button class="btn small danger" onclick="rejectApplicant('${a.id}')">${t('reject_app')}</button> `;
+    if(a.stage==='已聘用'&&!a.converted)acts+=`<button class="btn small" onclick="hireApplicant('${a.id}')">${t('hire_app')}</button> `;
+    acts+=`<button class="btn small danger" onclick="delApplicant('${a.id}')">${t('del')}</button>`;
+    return `<tr><td><b>${esc(a.name)}</b><br><small style="color:var(--muted)">${esc(a.id)}</small></td><td>${esc(a.email||'—')}<br><small style="color:var(--muted)">${esc(a.phone||'')}</small></td><td>${j?esc(j.title):'—'}</td><td>${esc(a.appliedDate)}</td><td>${esc(a.source||'—')}</td><td>${badge(a.stage)}${a.converted?` <span class="badge b-green">${t('rec_converted')}</span>`:''}</td><td>${esc(a.notes||'—')}</td><td style="white-space:nowrap">${acts}</td></tr>`}).join(''):`<tr><td colspan="8"><div class="empty">${t('rec_no_apps')}</div></td></tr>`;
+}
+function viewJobApplicants(id){$('recJobFilter').value=id;renderApplicants();$('recAppPanel').scrollIntoView()}
+let editingJob=null;
+function openJobModal(id){
+  editingJob=id||null;const f=$('jobForm');f.reset();
+  $('jobFormDept').innerHTML=DB.depts.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
+  $('jobFormType').innerHTML=['全職','兼職','合約'].map(s=>`<option value="${s}">${jt(s)}</option>`).join('');
+  $('jobFormStatus').innerHTML=['開放','已暫停','已關閉'].map(s=>`<option value="${s}">${st(s)}</option>`).join('');
+  $('jobModalTitle').textContent=t(id?'job_edit':'job_new');
+  if(id){const j=jobById(id);f.title.value=j.title;f.deptId.value=j.deptId;f.type.value=j.type;f.location.value=j.location||'';f.headcount.value=j.headcount;f.status.value=j.status;f.salMin.value=j.salMin||'';f.salMax.value=j.salMax||'';f.desc.value=j.desc||''}
+  $('jobModal').classList.add('open');
+}
+function saveJob(ev){
+  ev.preventDefault();const f=new FormData(ev.target);
+  const salMin=Number(f.get('salMin'))||0,salMax=Number(f.get('salMax'))||0;
+  if(salMax&&salMin&&salMax<salMin){alert(t('msg_sal_range'));return}
+  const data={title:f.get('title'),deptId:f.get('deptId'),type:f.get('type'),location:f.get('location'),headcount:Number(f.get('headcount'))||1,status:f.get('status'),salMin,salMax,desc:f.get('desc')};
+  if(editingJob){Object.assign(jobById(editingJob),data);toast(t('msg_job_updated'))}
+  else{DB.jobs.push({id:'J'+(DB.seq.job++),postedDate:new Date().toISOString().slice(0,10),...data});toast(t('msg_job_added'))}
+  save();closeModal('jobModal');renderAll();
+}
+function delJob(id){
+  if(DB.applicants.some(a=>a.jobId===id)){alert(t('msg_job_blocked'));return}
+  if(!confirm(t('msg_confirm_del_job')))return;
+  DB.jobs=DB.jobs.filter(x=>x.id!==id);save();renderAll();toast(t('msg_job_deleted'));
+}
+function toggleJobStatus(id){
+  const j=jobById(id);if(!j)return;
+  j.status=j.status==='開放'?'已關閉':'開放';save();renderAll();toast(t(j.status==='開放'?'msg_job_reopened':'msg_job_closed'));
+}
+function openAppModal(){
+  const f=$('appForm');f.reset();
+  const cur=$('recJobFilter').value;
+  $('appFormJob').innerHTML=DB.jobs.map(j=>`<option value="${j.id}">${esc(j.title)}（${esc(deptName(j.deptId))}）</option>`).join('');
+  if(cur&&jobById(cur))$('appFormJob').value=cur;
+  f.appliedDate.value=new Date().toISOString().slice(0,10);
+  $('appModal').classList.add('open');
+}
+function saveApplicant(ev){
+  ev.preventDefault();const f=new FormData(ev.target);
+  DB.applicants.push({id:'A'+(DB.seq.app++),jobId:f.get('jobId'),name:f.get('name'),email:f.get('email'),phone:f.get('phone'),source:f.get('source'),stage:'已申請',appliedDate:f.get('appliedDate'),notes:f.get('notes'),converted:false});
+  save();closeModal('appModal');renderAll();toast(t('msg_app_added'));
+}
+function advanceApplicant(id){
+  const a=DB.applicants.find(x=>x.id===id);if(!a)return;const idx=stageIdx(a.stage);
+  if(idx<0||idx>=STAGES.length-1)return;
+  a.stage=STAGES[idx+1];save();renderAll();toast(t('msg_app_stage').replace('{s}',st(a.stage)));
+}
+function rejectApplicant(id){const a=DB.applicants.find(x=>x.id===id);if(!a||a.stage==='已拒絕')return;a.stage='已拒絕';save();renderAll();toast(t('msg_app_rejected'))}
+function reopenApplicant(id){const a=DB.applicants.find(x=>x.id===id);if(!a||a.stage!=='已拒絕')return;a.stage='已申請';save();renderAll();toast(t('msg_app_reopened'))}
+function hireApplicant(id){
+  const a=DB.applicants.find(x=>x.id===id);if(!a||a.stage!=='已聘用'||a.converted)return;
+  const j=jobById(a.jobId);if(!j)return;
+  const salary=Math.round((((j.salMin||0)+(j.salMax||0))/2||j.salMin||0)/100)*100;
+  const emp={id:'E'+String(DB.seq.emp++).padStart(3,'0'),name:a.name,enName:'',deptId:j.deptId,position:j.title,salary:Math.max(0,salary),joinDate:new Date().toISOString().slice(0,10),status:'在職',alBal:14,sickBal:10,email:a.email||'',phone:a.phone||'',color:COLORS[DB.emps.length%COLORS.length]};
+  DB.emps.push(emp);a.converted=true;a.convertedEmpId=emp.id;save();renderAll();toast(t('msg_app_converted')+'：'+a.name+'（'+emp.id+'）');
+}
+function delApplicant(id){
+  const a=DB.applicants.find(x=>x.id===id);if(!a)return;
+  if(!confirm(t('msg_confirm_del_app').replace('{n}',a.name)))return;
+  DB.applicants=DB.applicants.filter(x=>x.id!==id);save();renderAll();toast(t('msg_app_deleted'));
+}
+
 /* ============ Common ============ */
 function closeModal(id){$(id).classList.remove('open')}
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
-function renderAll(){fillDeptSelects();renderDashboard();renderEmployees();renderDepts();renderAtt();renderLeaves();renderPayroll()}
+function renderAll(){fillDeptSelects();renderDashboard();renderEmployees();renderDepts();renderAtt();renderLeaves();renderPayroll();renderRecruitment()}
 
 /* ============ Init (IndexedDB, with localStorage migration) ============ */
 (async function init(){
