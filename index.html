@@ -135,6 +135,18 @@ tr:hover td{background:#f8fafc}
     <section class="page" id="page-payroll">
       <div class="topbar"><div><h2>薪酬管理</h2><div class="sub">本月薪金與強積金（MPF）計算</div></div><button class="btn ghost" onclick="exportPayroll()">⬇ 匯出薪酬 CSV</button></div>
       <div class="cards" id="payCards"></div>
+      <div class="panel"><h3>批量調整薪酬</h3>
+        <div class="toolbar">
+          <select id="bulkScope" style="min-width:170px"></select>
+          <select id="bulkMode"><option value="percent">按百分比 (%)</option><option value="amount">按固定金額 (HK$)</option></select>
+          <input id="bulkValue" type="number" step="any" placeholder="例：5 代表 +5%／減薪入負數" style="flex:1;min-width:180px">
+          <button class="btn ghost" onclick="previewBulk()">預覽調整</button>
+          <button class="btn" id="bulkApplyBtn" onclick="applyBulk()" disabled style="opacity:.5">確認套用</button>
+        </div>
+        <p class="note">百分比可入負數（例如 -3 即減薪 3%）；固定金額同樣可入負數。新薪金會四捨五入至整數並且不會低於 HK$0。套用前必須先預覽，套用後可在下方調整記錄撤銷最近一次。</p>
+        <div id="bulkPreview"></div>
+      </div>
+      <div class="panel"><h3>薪酬調整記錄</h3><div id="bulkHistory"></div></div>
       <div class="panel"><div style="overflow:auto"><table><thead><tr><th>員工</th><th>基本月薪</th><th>僱員 MPF (5%)</th><th>僱主 MPF (5%)</th><th>實發薪金</th></tr></thead><tbody id="payTable"></tbody></table></div>
       <p class="note">MPF 計算跟香港現行規則示範：僱主及僱員各供款入息 5%，每月供款上限各 HK$1,500（有關入息上限 HK$30,000）；月入低於 HK$7,100 僱員免供款、僱主仍須供款。此頁僅作系統示範，不構成薪酬或法例意見。</p></div>
     </section>
@@ -209,10 +221,10 @@ function seed(){
     {id:'L1',empId:'E006',type:'年假',start:today,end:today,days:1,reason:'家庭事務',status:'待批核',applied:today},
     {id:'L2',empId:'E003',type:'病假',start:today,end:today,days:1,reason:'感冒求診',status:'已批核',applied:today},
     {id:'L3',empId:'E011',type:'年假',start:'2026-12-24',end:'2026-12-31',days:6,reason:'聖誕外遊',status:'待批核',applied:today}];
-  return {depts,emps,att,leaves,seq:{emp:13,dept:6,leave:4,att:100}};
+  return {depts,emps,att,leaves,salaryAdjustments:[],seq:{emp:13,dept:6,leave:4,att:100,adj:1}};
 }
 let DB=load();
-function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.emps)return d}catch(e){} const s=seed();localStorage.setItem(KEY,JSON.stringify(s));return s}
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.emps){if(!Array.isArray(d.salaryAdjustments))d.salaryAdjustments=[];if(!d.seq)d.seq={emp:100,dept:100,leave:100,att:100};if(!d.seq.adj)d.seq.adj=d.salaryAdjustments.length+1;return d}}catch(e){} const s=seed();localStorage.setItem(KEY,JSON.stringify(s));return s}
 function save(){localStorage.setItem(KEY,JSON.stringify(DB))}
 function $(id){return document.getElementById(id)}
 function fmt(n){return Number(n).toLocaleString('en-HK')}
@@ -258,6 +270,7 @@ function fillDeptSelects(){
   $('empDeptFilter').innerHTML=opts;
   $('empFormDept').innerHTML=DB.depts.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
   $('deptMgr').innerHTML='<option value="">（未指定）</option>'+DB.emps.filter(e=>e.status!=='已離職').map(e=>`<option value="${e.id}">${esc(e.name)}（${esc(deptName(e.deptId))}）</option>`).join('');
+  $('bulkScope').innerHTML='<option value="ALL">全部在職員工</option>'+DB.depts.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
   $('attEmp').innerHTML=DB.emps.filter(e=>e.status!=='已離職').map(e=>`<option value="${e.id}">${esc(e.name)}（${esc(deptName(e.deptId))}）</option>`).join('');
   $('leaveEmp').innerHTML=DB.emps.filter(e=>e.status!=='已離職').map(e=>`<option value="${e.id}">${esc(e.name)}（年假餘 ${e.alBal} 日）</option>`).join('');
 }
@@ -311,6 +324,42 @@ function renderPayroll(){
   const rows=payrollRows();const total=rows.reduce((s,r)=>s+r.base,0),er=rows.reduce((s,r)=>s+r.erMpf,0),net=rows.reduce((s,r)=>s+r.net,0);
   $('payCards').innerHTML=[['💵 本月薪金總額','HK$'+fmt(total)],['🏢 僱主 MPF 總供款','HK$'+fmt(er)],['👛 員工實發總額','HK$'+fmt(net)],['👥 出糧人數',rows.length+' 人']].map(c=>`<div class="card"><div class="k">${c[0]}</div><div class="v" style="font-size:23px">${c[1]}</div></div>`).join('');
   $('payTable').innerHTML=rows.map(r=>`<tr><td>${personCell(r.e)}</td><td>HK$ ${fmt(r.base)}</td><td>HK$ ${fmt(r.empMpf)}</td><td>HK$ ${fmt(r.erMpf)}</td><td><b>HK$ ${fmt(r.net)}</b></td></tr>`).join('');
+  renderBulkHistory();
+}
+
+/* Bulk salary adjustment */
+let bulkPlan=null;
+function bulkTargets(){const scope=$('bulkScope').value;return DB.emps.filter(e=>e.status!=='已離職'&&(scope==='ALL'||e.deptId===scope))}
+function bulkNewSalary(old,mode,val){let n=mode==='percent'?old*(1+val/100):old+val;n=Math.round(n);return Math.max(0,n)}
+function previewBulk(){
+  const mode=$('bulkMode').value,val=Number($('bulkValue').value);
+  if(!val||isNaN(val)){alert('請輸入有效嘅調整數值（百分比或金額，可用負數代表減薪）');return}
+  if(mode==='percent'&&val<=-100){alert('百分比減幅唔可以去到或超過 100%');return}
+  const targets=bulkTargets();if(!targets.length){alert('所選範圍冇在職員工');return}
+  bulkPlan={scope:$('bulkScope').value,scopeLabel:$('bulkScope').selectedOptions[0].textContent,mode,value:val,items:targets.map(e=>({id:e.id,before:e.salary,after:bulkNewSalary(e.salary,mode,val)}))};
+  const tb=bulkPlan.items.reduce((s,i)=>s+i.before,0),ta=bulkPlan.items.reduce((s,i)=>s+i.after,0),diff=ta-tb;
+  $('bulkPreview').innerHTML=`<div style="overflow:auto;margin-top:8px"><table><thead><tr><th>員工</th><th>現時月薪</th><th>調整後月薪</th><th>變動</th></tr></thead><tbody>${bulkPlan.items.map(i=>{const e=empById(i.id);const d=i.after-i.before;return `<tr><td>${e?personCell(e):esc(i.id)}</td><td>HK$ ${fmt(i.before)}</td><td><b>HK$ ${fmt(i.after)}</b></td><td style="color:${d>0?'var(--green)':d<0?'var(--red)':'var(--muted)'}">${d>0?'+':''}${fmt(d)}</td></tr>`}).join('')}</tbody></table></div><p style="margin-top:10px;font-size:14px">影響 <b>${bulkPlan.items.length}</b> 位員工 · 每月薪金總額 HK$ ${fmt(tb)} → HK$ ${fmt(ta)}（<b style="color:${diff>0?'var(--green)':diff<0?'var(--red)':'inherit'}">${diff>0?'+':''}${fmt(diff)} / 月</b>，全年 ${diff>0?'+':''}${fmt(diff*12)}）</p>`;
+  const b=$('bulkApplyBtn');b.disabled=false;b.style.opacity='1';toast('預覽已生成，核對後按「確認套用」');
+}
+function applyBulk(){
+  if(!bulkPlan){alert('請先預覽調整');return}
+  const label=bulkPlan.mode==='percent'?((bulkPlan.value>0?'+':'')+bulkPlan.value+'%'):((bulkPlan.value>0?'+HK$ ':'-HK$ ')+fmt(Math.abs(bulkPlan.value)));
+  if(!confirm(`確定為「${bulkPlan.scopeLabel}」批量調整薪酬（${label}）？\n影響 ${bulkPlan.items.length} 位員工，每月總額 ${fmt(bulkPlan.items.reduce((s,i)=>s+i.before,0))} → ${fmt(bulkPlan.items.reduce((s,i)=>s+i.after,0))}。`))return;
+  const snapshot={};bulkPlan.items.forEach(i=>{snapshot[i.id]=i.before;const e=empById(i.id);if(e)e.salary=i.after});
+  DB.salaryAdjustments.push({id:'ADJ'+(DB.seq.adj++),date:new Date().toISOString().slice(0,10),time:nowTime(),scopeLabel:bulkPlan.scopeLabel,mode:bulkPlan.mode,value:bulkPlan.value,count:bulkPlan.items.length,totalBefore:bulkPlan.items.reduce((s,i)=>s+i.before,0),totalAfter:bulkPlan.items.reduce((s,i)=>s+i.after,0),snapshot,undone:false});
+  bulkPlan=null;$('bulkPreview').innerHTML='';const b=$('bulkApplyBtn');b.disabled=true;b.style.opacity='.5';$('bulkValue').value='';
+  save();renderAll();toast('批量薪酬調整已套用');
+}
+function undoBulk(id){
+  const rec=DB.salaryAdjustments.find(a=>a.id===id);if(!rec||rec.undone)return;
+  if(!confirm('確定撤銷呢次批量調整？受影響員工嘅薪金會還原到調整前。'))return;
+  Object.entries(rec.snapshot).forEach(([empId,sal])=>{const e=empById(empId);if(e)e.salary=sal});
+  rec.undone=true;save();renderAll();toast('已撤銷該次批量調整');
+}
+function renderBulkHistory(){
+  const el=$('bulkHistory');if(!el)return;
+  const list=[...(DB.salaryAdjustments||[])].reverse();
+  el.innerHTML=list.length?`<div style="overflow:auto"><table><thead><tr><th>日期</th><th>範圍</th><th>調整</th><th>人數</th><th>每月總額變化</th><th>狀態</th><th></th></tr></thead><tbody>${list.map(a=>{const d=a.totalAfter-a.totalBefore;const label=a.mode==='percent'?((a.value>0?'+':'')+a.value+'%'):((a.value>0?'+HK$ ':'-HK$ ')+fmt(Math.abs(a.value)));return `<tr><td>${esc(a.date)} ${esc(a.time||'')}</td><td>${esc(a.scopeLabel)}</td><td>${esc(label)}</td><td>${a.count}</td><td>${fmt(a.totalBefore)} → ${fmt(a.totalAfter)}（${d>0?'+':''}${fmt(d)}）</td><td>${a.undone?'<span class="badge b-gray">已撤銷</span>':'<span class="badge b-green">已生效</span>'}</td><td>${a.undone?'':`<button class="btn small danger" onclick="undoBulk('${a.id}')">撤銷</button>`}</td></tr>`}).join('')}</tbody></table></div>`:'<div class="empty">暫時未有批量調整記錄</div>';
 }
 
 function closeModal(id){$(id).classList.remove('open')}
