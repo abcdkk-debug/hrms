@@ -273,6 +273,18 @@ async function idbDel(key){const db=await idbOpen();return new Promise((res,rej)
 
 /* ============ Data ============ */
 const COLORS=['#2563eb','#0ea5a4','#7c3aed','#db2777','#ea580c','#16a34a','#0891b2','#ca8a04'];
+function seedJobs(){return [
+    {id:'J1',title:'高級系統工程師',deptId:'D1',type:'全職',location:'金鐘總行',headcount:2,salMin:45000,salMax:60000,status:'開放',desc:'負責核心銀行系統開發及維運，熟悉 Java / Spring Boot。',postedDate:'2026-11-10'},
+    {id:'J2',title:'人力資源主任',deptId:'D2',type:'全職',location:'金鐘總行',headcount:1,salMin:25000,salMax:32000,status:'開放',desc:'處理招聘、入職及員工檔案管理。',postedDate:'2026-11-18'},
+    {id:'J3',title:'市場推廣助理',deptId:'D5',type:'合約',location:'金鐘總行',headcount:1,salMin:20000,salMax:24000,status:'已暫停',desc:'協助社交媒體推廣及活動籌備，為期 6 個月合約。',postedDate:'2026-11-05'}]}
+function seedApplicants(){return [
+    {id:'A1',jobId:'J1',name:'陳小明',email:'xiaoming.chan@example.com',phone:'91234567',source:'JobsDB',stage:'已申請',appliedDate:'2026-11-19',notes:'5 年 Java 經驗',converted:false},
+    {id:'A2',jobId:'J1',name:'何美琪',email:'meiki.ho@example.com',phone:'92345678',source:'公司網站',stage:'面試中',appliedDate:'2026-11-17',notes:'第二輪面試 11 月 25 日',converted:false},
+    {id:'A3',jobId:'J1',name:'許志豪',email:'chiho.hui@example.com',phone:'93456789',source:'員工推薦',stage:'已出offer',appliedDate:'2026-11-12',notes:'Offer 月薪 HK$52,000，待回覆',converted:false},
+    {id:'A4',jobId:'J2',name:'梁家俊',email:'kajun.leung@example.com',phone:'94567890',source:'JobsDB',stage:'面試中',appliedDate:'2026-11-20',notes:'',converted:false},
+    {id:'A5',jobId:'J2',name:'陳穎彤',email:'wingtung.chan@example.com',phone:'95678901',source:'LinkedIn',stage:'已申請',appliedDate:'2026-11-21',notes:'',converted:false},
+    {id:'A6',jobId:'J3',name:'吳子軒',email:'tszhin.ng@example.com',phone:'96789012',source:'公司網站',stage:'已拒絕',appliedDate:'2026-11-08',notes:'經驗與職位不符',converted:false},
+    {id:'A7',jobId:'J1',name:'林俊傑',email:'chunjie.lam@example.com',phone:'97890123',source:'獵頭公司',stage:'已聘用',appliedDate:'2026-11-09',notes:'已接受 offer，12 月 1 日入職',converted:false}]}
 function seed(){
   const depts=[
     {id:'D1',name:'金融科技部',desc:'資訊科技基礎設施及系統開發',managerId:'E001'},
@@ -300,21 +312,11 @@ function seed(){
     {id:'L1',empId:'E006',type:'年假',start:today,end:today,days:1,reason:'家庭事務',status:'待批核',applied:today},
     {id:'L2',empId:'E003',type:'病假',start:today,end:today,days:1,reason:'感冒求診',status:'已批核',applied:today},
     {id:'L3',empId:'E011',type:'年假',start:'2026-12-24',end:'2026-12-31',days:6,reason:'聖誕外遊',status:'待批核',applied:today}];
-  const jobs=[
-    {id:'J1',title:'高級系統工程師',deptId:'D1',type:'全職',location:'金鐘總行',headcount:2,salMin:45000,salMax:60000,status:'開放',desc:'負責核心銀行系統開發及維運，熟悉 Java / Spring Boot。',postedDate:'2026-11-10'},
-    {id:'J2',title:'人力資源主任',deptId:'D2',type:'全職',location:'金鐘總行',headcount:1,salMin:25000,salMax:32000,status:'開放',desc:'處理招聘、入職及員工檔案管理。',postedDate:'2026-11-18'},
-    {id:'J3',title:'市場推廣助理',deptId:'D5',type:'合約',location:'金鐘總行',headcount:1,salMin:20000,salMax:24000,status:'已暫停',desc:'協助社交媒體推廣及活動籌備，為期 6 個月合約。',postedDate:'2026-11-05'}];
-  const applicants=[
-    {id:'A1',jobId:'J1',name:'陳小明',email:'xiaoming.chan@example.com',phone:'91234567',source:'JobsDB',stage:'已申請',appliedDate:'2026-11-19',notes:'5 年 Java 經驗',converted:false},
-    {id:'A2',jobId:'J1',name:'何美琪',email:'meiki.ho@example.com',phone:'92345678',source:'公司網站',stage:'面試中',appliedDate:'2026-11-17',notes:'第二輪面試 11 月 25 日',converted:false},
-    {id:'A3',jobId:'J1',name:'許志豪',email:'chiho.hui@example.com',phone:'93456789',source:'員工推薦',stage:'已出offer',appliedDate:'2026-11-12',notes:'Offer 月薪 HK$52,000，待回覆',converted:false},
-    {id:'A4',jobId:'J2',name:'梁家俊',email:'kajun.leung@example.com',phone:'94567890',source:'JobsDB',stage:'面試中',appliedDate:'2026-11-20',notes:'',converted:false},
-    {id:'A5',jobId:'J2',name:'陳穎彤',email:'wingtung.chan@example.com',phone:'95678901',source:'LinkedIn',stage:'已申請',appliedDate:'2026-11-21',notes:'',converted:false},
-    {id:'A6',jobId:'J3',name:'吳子軒',email:'tszhin.ng@example.com',phone:'96789012',source:'公司網站',stage:'已拒絕',appliedDate:'2026-11-08',notes:'經驗與職位不符',converted:false},
-    {id:'A7',jobId:'J1',name:'林俊傑',email:'chunjie.lam@example.com',phone:'97890123',source:'獵頭公司',stage:'已聘用',appliedDate:'2026-11-09',notes:'已接受 offer，12 月 1 日入職',converted:false}];
+  const jobs=seedJobs();
+  const applicants=seedApplicants();
   return {depts,emps,att,leaves,jobs,applicants,salaryAdjustments:[],seq:{emp:13,dept:6,leave:4,att:100,adj:1,job:4,app:8}};
 }
-function normalize(d){if(!Array.isArray(d.salaryAdjustments))d.salaryAdjustments=[];if(!Array.isArray(d.jobs))d.jobs=[];if(!Array.isArray(d.applicants))d.applicants=[];if(!d.seq)d.seq={emp:100,dept:100,leave:100,att:100,adj:1};if(!d.seq.adj)d.seq.adj=d.salaryAdjustments.length+1;if(!d.seq.job)d.seq.job=d.jobs.length+1;if(!d.seq.app)d.seq.app=d.applicants.length+1;return d}
+function normalize(d){if(!Array.isArray(d.salaryAdjustments))d.salaryAdjustments=[];if(!Array.isArray(d.jobs))d.jobs=seedJobs();if(!Array.isArray(d.applicants))d.applicants=seedApplicants();if(!d.seq)d.seq={emp:100,dept:100,leave:100,att:100,adj:1};if(!d.seq.adj)d.seq.adj=d.salaryAdjustments.length+1;if(!d.seq.job)d.seq.job=d.jobs.length+1;if(!d.seq.app)d.seq.app=d.applicants.length+1;return d}
 let DB=null;
 function save(){if(DB)idbSet('state',DB).catch(e=>console.error('IDB save failed',e))}
 async function savePrefs(){try{await idbSet('ui',{theme:THEME,lang:LANG})}catch(e){}}
