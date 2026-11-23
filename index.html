@@ -314,9 +314,9 @@ function seed(){
     {id:'L3',empId:'E011',type:'年假',start:'2026-12-24',end:'2026-12-31',days:6,reason:'聖誕外遊',status:'待批核',applied:today}];
   const jobs=seedJobs();
   const applicants=seedApplicants();
-  return {depts,emps,att,leaves,jobs,applicants,salaryAdjustments:[],seq:{emp:13,dept:6,leave:4,att:100,adj:1,job:4,app:8}};
+  return {depts,emps,att,leaves,jobs,applicants,salaryAdjustments:[],recSeeded:true,seq:{emp:13,dept:6,leave:4,att:100,adj:1,job:4,app:8}};
 }
-function normalize(d){if(!Array.isArray(d.salaryAdjustments))d.salaryAdjustments=[];if(!Array.isArray(d.jobs))d.jobs=seedJobs();if(!Array.isArray(d.applicants))d.applicants=seedApplicants();if(!d.seq)d.seq={emp:100,dept:100,leave:100,att:100,adj:1};if(!d.seq.adj)d.seq.adj=d.salaryAdjustments.length+1;if(!d.seq.job)d.seq.job=d.jobs.length+1;if(!d.seq.app)d.seq.app=d.applicants.length+1;return d}
+function normalize(d){if(!Array.isArray(d.salaryAdjustments))d.salaryAdjustments=[];if(!d.recSeeded){if(!Array.isArray(d.jobs)||d.jobs.length===0)d.jobs=seedJobs();if(!Array.isArray(d.applicants)||d.applicants.length===0)d.applicants=seedApplicants();d.recSeeded=true}if(!Array.isArray(d.jobs))d.jobs=[];if(!Array.isArray(d.applicants))d.applicants=[];if(!d.seq)d.seq={emp:100,dept:100,leave:100,att:100,adj:1};if(!d.seq.adj)d.seq.adj=d.salaryAdjustments.length+1;if(!d.seq.job)d.seq.job=d.jobs.length+1;if(!d.seq.app)d.seq.app=d.applicants.length+1;return d}
 let DB=null;
 function save(){if(DB)idbSet('state',DB).catch(e=>console.error('IDB save failed',e))}
 async function savePrefs(){try{await idbSet('ui',{theme:THEME,lang:LANG})}catch(e){}}
