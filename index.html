@@ -58,7 +58,7 @@ html[data-theme="dark"] .b-green{background:#14532d;color:#bbf7d0}html[data-them
 .page{display:none}.page.active{display:block}
 .bar-row{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:13px}
 .bar-row .name{width:110px;flex:none}.bar-track{flex:1;background:var(--track);border-radius:99px;height:12px;overflow:hidden}
-.bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--teal));border-radius:99px}
+.bar-fill{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--teal));border-radius:99px}
 .bar-row .num{width:52px;text-align:right;color:var(--muted)}
 .modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:flex-start;justify-content:center;padding:28px 14px;z-index:50;overflow:auto}
 .modal.open{display:flex}
@@ -672,7 +672,7 @@ let editingReview=null;
 function openReviewModal(id){
   editingReview=id||null;
   const openCycles=DB.reviewCycles.filter(c=>c.status==='進行中');
-  if(!id&&!openCycles.length){alert(t('perf_no_open_cycle'));return}
+  if(!id&&!openCycles.length){toast(t('perf_no_open_cycle'));return}
   const f=$('reviewForm');f.reset();
   $('reviewFormEmp').innerHTML=DB.emps.filter(e=>e.status!=='已離職').map(e=>`<option value="${e.id}">${esc(e.name)}（${esc(deptName(e.deptId))}）</option>`).join('');
   $('reviewFormCycle').innerHTML=DB.reviewCycles.map(c=>`<option value="${c.id}">${esc(c.name)}${c.status==='已結束'?'（'+t('st_已結束')+'）':''}</option>`).join('');
@@ -687,9 +687,9 @@ function saveReview(ev){
   ev.preventDefault();
   const f=ev.target instanceof FormData?ev.target:new FormData(ev.target);
   const cycleId=f.get('cycleId');const c=cycleById(cycleId);
-  if(!c||c.status!=='進行中'){alert(t('perf_cycle_closed'));return}
+  if(!c||c.status!=='進行中'){toast(t('perf_cycle_closed'));return}
   const empId=f.get('empId');
-  if(DB.reviews.some(r=>r.empId===empId&&r.cycleId===cycleId&&r.id!==editingReview)){alert(t('perf_dup'));return}
+  if(DB.reviews.some(r=>r.empId===empId&&r.cycleId===cycleId&&r.id!==editingReview)){toast(t('perf_dup'));return}
   const data={empId,cycleId,work:Number(f.get('work')),team:Number(f.get('team')),initiative:Number(f.get('initiative')),comm:Number(f.get('comm')),comment:f.get('comment'),reviewer:f.get('reviewer'),date:f.get('date')};
   if(editingReview){Object.assign(DB.reviews.find(x=>x.id===editingReview),data);toast(t('msg_review_updated'))}
   else{DB.reviews.push({id:'RV'+(DB.seq.review++),...data});toast(t('msg_review_added'))}
