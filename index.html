@@ -390,7 +390,7 @@ function ct(v){return t('ct_'+v)||v}
 function md(v){return t('md_'+v)||v}
 
 /* ============ IndexedDB storage ============ */
-const APP_VERSION='v1.6.0';
+const APP_VERSION='v1.6.1';
 const IDB_NAME='hrms-db', IDB_STORE='kv';
 function idbOpen(){return new Promise((res,rej)=>{const r=indexedDB.open(IDB_NAME,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(IDB_STORE))r.result.createObjectStore(IDB_STORE)};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
 async function idbGet(key){const db=await idbOpen();return new Promise((res,rej)=>{const q=db.transaction(IDB_STORE,'readonly').objectStore(IDB_STORE).get(key);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
@@ -637,7 +637,7 @@ function renderLeaveCal(){
     html+=`<div class="cal-cell${other?' other':''}${ds===today?' today':''}${ds===calSel?' sel':''}" onclick="calSelectDay('${ds}')"><div class="cal-day">${d.getDate()}${ds===today?`<span class="today-tag">${t('cal_today_mark')}</span>`:''}</div>${chips}${more}</div>`;
   }
   $('calGrid').innerHTML=html;
-  $('calLegend').innerHTML=`<span>${t('cal_legend')}：</span>`+['年假','病假','事假','婚假','產假','陪產假'].map(s=>`<span class="cal-chip ${CAL_TYPE_BADGE[s]}" style="display:inline-block;margin-top:0">${esc(lt(s))}</span>`).join('')+`<span>${t('cal_pending_note')}</span>`;
+  $('calLegend').innerHTML=`<span>${t('cal_legend')}${LANG==='zh'?'：':':'} </span>`+['年假','病假','事假','婚假','產假','陪產假'].map(s=>`<span class="cal-chip ${CAL_TYPE_BADGE[s]}" style="display:inline-block;margin-top:0">${esc(lt(s))}</span>`).join('')+`<span>${t('cal_pending_note')}</span>`;
   const selLeaves=leaves.filter(l=>l.start<=calSel&&calSel<=l.end);
   $('calDayLabel').textContent='· '+calSel;
   $('calDayList').innerHTML=selLeaves.length?selLeaves.map(l=>{const e=empById(l.empId);return `<div class="bar-row"><span style="flex:1">${e?personCell(e):esc(l.empId)} · ${esc(lt(l.type))} ${esc(l.start)} – ${esc(l.end)} · ${l.days}${t('days')}${l.reason?' · '+esc(l.reason):''}</span>${badge(l.status)}</div>`}).join(''):`<div class="empty">${t('cal_no_leave_day')}</div>`;
