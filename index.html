@@ -92,6 +92,7 @@ html[data-theme="dark"] .toast{background:#e2e8f0;color:#0f172a}
 .cal-check{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--text);cursor:pointer}
 .cal-check input{accent-color:var(--blue)}
 .org-wrap{overflow:auto;padding:6px 2px 2px}
+.org-tree{width:max-content;min-width:100%}
 .org-tree,.org-tree ul{list-style:none;margin:0;padding:0}
 .org-tree ul{padding-top:18px;position:relative;display:flex;justify-content:center}
 .org-tree li{position:relative;padding:18px 5px 0;text-align:center;list-style:none}
@@ -423,7 +424,7 @@ function ct(v){return t('ct_'+v)||v}
 function md(v){return t('md_'+v)||v}
 
 /* ============ IndexedDB storage ============ */
-const APP_VERSION='v1.7.0';
+const APP_VERSION='v1.7.1';
 const IDB_NAME='hrms-db', IDB_STORE='kv';
 function idbOpen(){return new Promise((res,rej)=>{const r=indexedDB.open(IDB_NAME,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(IDB_STORE))r.result.createObjectStore(IDB_STORE)};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
 async function idbGet(key){const db=await idbOpen();return new Promise((res,rej)=>{const q=db.transaction(IDB_STORE,'readonly').objectStore(IDB_STORE).get(key);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
