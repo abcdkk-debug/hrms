@@ -109,8 +109,11 @@ html[data-theme="dark"] .toast{background:#e2e8f0;color:#0f172a}
 .sidebar.collapsed .sidefoot{padding:14px 8px;text-align:center}
 .sidebar.collapsed .sidefoot>span,.sidebar.collapsed #resetData,.sidebar.collapsed #versionLine{display:none}
 .sidebar.collapsed .uibtns{flex-direction:column}
+.sidebar.collapsed #themeBtn span{display:none}
 .sidebar.collapsed #langBtn{font-size:0}
 .sidebar.collapsed #langBtn::after{content:'🌐';font-size:14px}
+.sidebar.collapsed .nav button{position:relative;overflow:visible}
+.sidebar.collapsed .nav button:hover span{display:block;position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);background:#0f2447;color:#fff;padding:6px 10px;border-radius:8px;white-space:nowrap;z-index:60;box-shadow:0 4px 14px rgba(0,0,0,.3);font-size:14px;pointer-events:none}
 .org-wrap{overflow:auto;padding:6px 2px 2px}
 .org-tree{width:max-content;min-width:100%}
 .org-tree,.org-tree ul{list-style:none;margin:0;padding:0}
@@ -444,7 +447,7 @@ function ct(v){return t('ct_'+v)||v}
 function md(v){return t('md_'+v)||v}
 
 /* ============ IndexedDB storage ============ */
-const APP_VERSION='v1.8.0';
+const APP_VERSION='v1.8.1';
 const IDB_NAME='hrms-db', IDB_STORE='kv';
 function idbOpen(){return new Promise((res,rej)=>{const r=indexedDB.open(IDB_NAME,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(IDB_STORE))r.result.createObjectStore(IDB_STORE)};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
 async function idbGet(key){const db=await idbOpen();return new Promise((res,rej)=>{const q=db.transaction(IDB_STORE,'readonly').objectStore(IDB_STORE).get(key);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
@@ -541,7 +544,8 @@ function personCell(e){return `<div class="person"><span class="avatar" style="b
 /* ============ Theme & Language ============ */
 function applyTheme(){document.documentElement.dataset.theme=THEME;document.querySelector('#themeBtn span').textContent=t(THEME==='dark'?'theme_light':'theme_dark');$('themeBtn').firstChild.textContent=THEME==='dark'?'☀️ ':'🌙 '}
 function toggleTheme(){THEME=THEME==='dark'?'light':'dark';applyTheme();savePrefs()}
-function applySidebar(){const sb=document.querySelector('.sidebar');if(!sb)return;sb.classList.toggle('collapsed',SIDE_COLLAPSED);const b=$('sideToggle');if(b){b.textContent=SIDE_COLLAPSED?'»':'«';b.title=t(SIDE_COLLAPSED?'menu_expand':'menu_collapse')}document.querySelectorAll('.nav button').forEach(x=>{const s=x.querySelector('span');if(s)x.title=s.textContent})}
+function applySidebar(){const sb=document.querySelector('.sidebar');if(!sb)return;sb.classList.toggle('collapsed',SIDE_COLLAPSED);const b=$('sideToggle');if(b){const mobile=window.innerWidth<=900;b.textContent=mobile?(SIDE_COLLAPSED?'˅':'˄'):(SIDE_COLLAPSED?'»':'«');b.title=t(SIDE_COLLAPSED?'menu_expand':'menu_collapse')}document.querySelectorAll('.nav button').forEach(x=>{const s=x.querySelector('span');if(s)x.title=s.textContent})}
+window.addEventListener('resize',()=>applySidebar());
 function toggleSidebar(){SIDE_COLLAPSED=!SIDE_COLLAPSED;applySidebar();savePrefs()}
 function applyI18n(){
   document.documentElement.lang=LANG==='zh'?'zh-HK':'en';
@@ -1084,7 +1088,7 @@ function renderAll(){fillDeptSelects();renderDashboard();renderEmployees();rende
 (async function init(){
   let migrated=false;
   try{
-    const ui=await idbGet('ui');if(ui){THEME=ui.theme||'light';LANG=ui.lang||'zh';SIDE_COLLAPSED=!!ui.sideCollapsed}
+    const ui=await idbGet('ui');if(ui){THEME=ui.theme||'light';LANG=ui.lang||'zh';SIDE_COLLAPSED=(ui.sideCollapsed!==undefined)?!!ui.sideCollapsed:(window.innerWidth<=900)}
     let state=await idbGet('state');
     if(!state){
       const legacy=localStorage.getItem('hrms_v1');
