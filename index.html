@@ -39,7 +39,7 @@ html[data-theme="dark"] .btn.danger{border-color:#7f1d1d}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
 .card .k{font-size:13px;color:var(--muted)} .card .v{font-size:30px;font-weight:700;margin:6px 0 2px} .card .d{font-size:12px;color:var(--muted)}
 .grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
-@media(max-width:900px){.grid2{grid-template-columns:1fr}.sidebar{position:static;width:100%}.layout{flex-direction:column}.main{margin-left:0;padding:16px}.sidebar.collapsed{width:100%}.sidebar.collapsed~.main{margin-left:0}.sidebar.collapsed .nav,.sidebar.collapsed .sidefoot{display:none}.sidebar.collapsed .logo{padding:20px 18px 14px;text-align:left}.sidebar.collapsed .logo h1{font-size:20px}.sidebar.collapsed .logo h1::before{content:none}.sidebar.collapsed .logo p{display:block}.sidebar.collapsed .side-toggle{position:absolute;margin:0}}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}.sidebar{position:static;width:100%}.layout{flex-direction:column}.main{margin-left:0;padding:16px}}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
 .panel h3{font-size:16px;margin-bottom:12px}
 table{width:100%;border-collapse:collapse;font-size:14px}
@@ -137,6 +137,7 @@ html[data-theme="dark"] .toast{background:#e2e8f0;color:#0f172a}
 .org-node.root{background:var(--blue);color:#fff;border-color:var(--blue);cursor:default;min-width:180px}
 .org-node.root .org-sub{color:#dbeafe}
 .org-toggle{position:absolute;top:4px;right:8px;font-weight:700;color:var(--muted);font-size:14px}
+@media(max-width:900px){.sidebar.collapsed{width:100%}.sidebar.collapsed~.main{margin-left:0}.sidebar.collapsed .nav,.sidebar.collapsed .sidefoot{display:none}.sidebar.collapsed .logo{padding:20px 18px 14px;text-align:left}.sidebar.collapsed .logo h1{font-size:20px}.sidebar.collapsed .logo h1::before{content:none}.sidebar.collapsed .logo p{display:block}.sidebar.collapsed .side-toggle{position:absolute;margin:0}}
 </style>
 </head>
 <body>
@@ -447,7 +448,7 @@ function ct(v){return t('ct_'+v)||v}
 function md(v){return t('md_'+v)||v}
 
 /* ============ IndexedDB storage ============ */
-const APP_VERSION='v1.8.1';
+const APP_VERSION='v1.8.2';
 const IDB_NAME='hrms-db', IDB_STORE='kv';
 function idbOpen(){return new Promise((res,rej)=>{const r=indexedDB.open(IDB_NAME,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(IDB_STORE))r.result.createObjectStore(IDB_STORE)};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
 async function idbGet(key){const db=await idbOpen();return new Promise((res,rej)=>{const q=db.transaction(IDB_STORE,'readonly').objectStore(IDB_STORE).get(key);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
